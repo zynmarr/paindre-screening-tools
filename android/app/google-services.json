@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414832348965",
+    "project_id": "paindre-screening-tools",
+    "storage_bucket": "paindre-screening-tools.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414832348965:android:53ca9df0ce10e91e4dd4cc",
+        "android_client_info": {
+          "package_name": "com.paindre_innovation.screening_tools_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHtq3ijkoVxjVhEqgl-mlMHDc-g74-bH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
