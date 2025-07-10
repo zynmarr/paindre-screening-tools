@@ -1,66 +1,142 @@
+import 'dart:ui';
 import 'package:bot_toast/bot_toast.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:screening_tools_android/app/controllers/patient/patient.dart';
-import 'package:screening_tools_android/app/controllers/scoring_result/scoring_result.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:screening_tools_android/app/controllers/service/notification_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:screening_tools_android/app/controllers/service/service_controller.dart';
 import 'package:screening_tools_android/app/core/core.dart';
 import 'package:screening_tools_android/app/routes/routes.dart';
-import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-    androidProvider: AndroidProvider.playIntegrity,
-    appleProvider: AppleProvider.appAttest,
-  );
-  await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => PatientController()),
-        ChangeNotifierProvider(create: (_) => ScoringResultController()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  await NotificationService.instance.init();
+  await InitLanguageCode.init();
+  
+  // Initialize Firebase Crashlytics
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+  // await ApiService().verifyToken('http://10.140.152.123:3000/verifyToken');
+  runApp(ChangeNotifierProvider(create: (context) => ServiceController(), lazy: true, child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Paindre Screening Tools',
+      // locale: locale,
+      translations: AppTranslations(),
+      supportedLocales: const [Locale('en'), Locale('id')],
+      // locale: Get.deviceLocale, // or set default locale
+      localizationsDelegates: [GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate, GlobalWidgetsLocalizations.delegate],
+      fallbackLocale: const Locale('en'),
       theme: AppTheme().themeData,
       debugShowCheckedModeBanner: false,
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
       onGenerateRoute: Routes.generateRoute,
-      initialRoute: 'splash-page',
+      initialRoute: Routes.splash,
     );
   }
 }
 
+class InitLanguageCode {
+  static Future<void> init() async {
+    // Check if language code is stored
+    if (!isLanguageCodeStored()) {
+      // If not, set default language code to 'en'
+      Locale defaultLocale = getCurrentLocale();
+      await setLanguageCode(defaultLocale.languageCode);
+    } else {
+      // If stored, update the locale with the stored language code
+      String languageCode = getStoredLanguageCode();
+      debugPrint("Stored language code: $languageCode");
+      Get.updateLocale(Locale(languageCode));
+    }
+  }
 
+  // check if language code is stored in GetStorage
+  static bool isLanguageCodeStored() {
+    return GetStorage().hasData('language_code');
+  }
 
-// Alias name: upload
-// Creation date: Dec 18, 2024
-// Entry type: PrivateKeyEntry
-// Certificate chain length: 1
-// Certificate[1]:
-// Owner: CN=Muammar Khadafi, OU=Unknown, O=Paindre Innovation, L=Banda Aceh, ST=Aceh, C=ID
-// Issuer: CN=Muammar Khadafi, OU=Unknown, O=Paindre Innovation, L=Banda Aceh, ST=Aceh, C=ID
-// Serial number: 442e934ca40b5871
-// Valid from: Wed Dec 18 21:07:09 WIB 2024 until: Sun May 05 21:07:09 WIB 2052
-// Certificate fingerprints:
-//          SHA1: 70:19:4F:F9:63:4E:A8:1E:CE:21:53:C8:DD:D4:37:6D:0A:BF:4F:2E
-//          SHA256: 19:66:7B:08:22:7A:40:66:D5:F8:AA:F7:A7:7C:D9:9F:E6:3B:97:EF:65:4E:DB:50:05:56:A3:C2:CD:59:A6:60
-// Signature algorithm name: SHA256withRSA
-// Subject Public Key Algorithm: 2048-bit RSA key
-// Version: 3
+  // get the stored language code
+  static String getStoredLanguageCode() {
+    return GetStorage().read('language_code');
+  }
+
+  // set the language code in GetStorage
+  static Future<void> setLanguageCode(String languageCode) async {
+    await GetStorage().write('language_code', languageCode);
+    debugPrint("Language code set to: $languageCode");
+    Get.updateLocale(Locale(languageCode));
+  }
+
+  // get the current locale
+  static Locale getCurrentLocale() {
+    String languageCode = Get.deviceLocale?.languageCode ?? 'en';
+    return Locale(languageCode);
+  }
+}
+
+// class _MyAppState extends State<MyApp> {
+//   // Locale _locale = Get.locale ?? const Locale('en');
+
+//   // void setLocale(Locale locale) {
+//   //   setState(() {
+//   //     _locale = locale;
+//   //   });
+//   // }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     Locale? locale = Get.deviceLocale; // Automatically gets the device locale
+//     Get.updateLocale(locale!); // Update the locale in GetX
+//     debugPrint("Current locale: ${Get.locale}");
+//     return GetMaterialApp(
+//       title: 'Paindre Screening Tools',
+//       locale: locale,
+//       translations: AppTranslations(),
+//       supportedLocales: const [Locale('en'), Locale('id')],
+//       // locale: Get.deviceLocale, // or set default locale
+//       localizationsDelegates: [GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate, GlobalWidgetsLocalizations.delegate],
+//       fallbackLocale: const Locale('en'),
+//       theme: AppTheme().themeData,
+//       debugShowCheckedModeBanner: false,
+//       builder: BotToastInit(),
+//       navigatorObservers: [BotToastNavigatorObserver()],
+//       onGenerateRoute: Routes.generateRoute,
+//       initialRoute: Routes.splash,
+//     );
+//   }
+// }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return GetMaterialApp(
+  //     title: 'Paindre Screening Tools',
+  //     theme: AppTheme().themeData,
+  //     debugShowCheckedModeBanner: false,
+  //     builder: BotToastInit(),
+  //     navigatorObservers: [BotToastNavigatorObserver()],
+  //     onGenerateRoute: Routes.generateRoute,
+  //     initialRoute: Routes.splash,
+  //   );
+  // }

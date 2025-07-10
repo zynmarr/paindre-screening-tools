@@ -7,7 +7,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 class Utils {
   static goToNextPage(String routesName, {dynamic arguments}) {
-    Get.toNamed(routesName, arguments: arguments);
+    Get.offAndToNamed(routesName, arguments: arguments);
   }
 
   static paindreShowLoading() {
@@ -15,7 +15,7 @@ class Utils {
       align: Alignment.center,
       useSafeArea: true,
       enableKeyboardSafeArea: false,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 20),
       backgroundColor: Colors.black45,
       toastBuilder: (cancelFunc) {
         return Container(
@@ -67,40 +67,4 @@ class Utils {
   static ymdFormat({DateTime? dateTime}) {
     return DateFormat("y-M-d").format(dateTime ?? DateTime.now());
   }
-
-  // showDialogAndBack({required String routesName, dynamic arguments}) {
-  //   Get.defaultDialog(
-  //     barrierDismissible: false,
-  //     title: title,
-  //     titlePadding: const EdgeInsets.only(top: 15, bottom: 0, left: 8, right: 8),
-  //     middleText: middleText,
-  //     backgroundColor: Colors.white,
-  //     titleStyle: TextStyle(color: Colors.blue[900], fontSize: 22, fontWeight: FontWeight.bold),
-  //     middleTextStyle: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w400),
-  //     radius: 6,
-  //     contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-  //     actions: [
-  //       if (confirm != null) confirm,
-  //       if (cancel != null) cancel,
-  //     ],
-  //   );
-  //   paindreDialog(
-  //     title: "Pemberitahuan",
-  //     middleText: "Apakah anda ingin keluar dari halaman ini?",
-  //     confirm: paindreButton(
-  //       child: const Text("Yes"),
-  //       onPressed: () {
-  //         Get.back();
-  //         Core.goToNextPage(routesName, arguments: arguments);
-  //       },
-  //     ),
-  //     cancel: paindreButton(
-  //       child: const Text("No"),
-  //       backgroundColor: Colors.red,
-  //       onPressed: () {
-  //         Get.back();
-  //       },
-  //     ),
-  //   );
-  // }
 }

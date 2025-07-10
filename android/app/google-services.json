@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "414832348965",
-    "project_id": "paindre-screening-tools",
-    "storage_bucket": "paindre-screening-tools.firebasestorage.app"
+    "project_number": "1009083053499",
+    "project_id": "paindre-screening-tools-d014e",
+    "storage_bucket": "paindre-screening-tools-d014e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:414832348965:android:53ca9df0ce10e91e4dd4cc",
+        "mobilesdk_app_id": "1:1009083053499:android:ff5e8f39324acb7da3c09e",
         "android_client_info": {
           "package_name": "com.paindre_innovation.screening_tools_android"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1009083053499-r2443i5r856ud2toh6imo9eb8gk000k0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.paindre_innovation.screening_tools_android",
+            "certificate_hash": "aa458b6f9673708b23cc2cfe306d00b76ba6bc4d"
+          }
+        },
+        {
+          "client_id": "1009083053499-s49smndaistusrn9qto75qt0srepckve.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAHtq3ijkoVxjVhEqgl-mlMHDc-g74-bH4"
+          "current_key": "AIzaSyAp2l3jzUBRL2tQFIaKFOMvS_4Baln9IG8"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1009083053499-s49smndaistusrn9qto75qt0srepckve.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

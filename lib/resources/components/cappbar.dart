@@ -1,16 +1,8 @@
 part of 'components.dart';
 
-AppBar cAppBar(BuildContext context, {String? title, List<Widget>? actions, bool centerTitle = false, Widget? leading}) {
+AppBar cAppBar({String title = "App Bar Title", List<Widget>? actions, bool centerTitle = false, Widget? leading}) {
   return AppBar(
-    title: title != null
-        ? Text(
-            title.toUpperCase(),
-            style: context.textTheme.titleLarge!.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          )
-        : null,
+    title: Text(title.toUpperCase(), style: Get.textTheme.headlineMedium!.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
     backgroundColor: Colors.blue[900],
     excludeHeaderSemantics: true,
     automaticallyImplyLeading: false,

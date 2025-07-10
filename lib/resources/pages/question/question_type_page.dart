@@ -18,7 +18,7 @@ class _QuestionTypePageState extends State<QuestionTypePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: cAppBar(context, title: "Paindre Screening Tools"),
+      appBar: cAppBar(title: "Paindre Screening Tools"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
         child: Column(
@@ -29,18 +29,13 @@ class _QuestionTypePageState extends State<QuestionTypePage> {
                   ListTile(
                     onTap: () {
                       Utils.goToNextPage('question-page', arguments: {'questioName': questioName});
-                      print(questioName);
+                      debugPrint(questioName);
                     },
-                    leading: Icon(
-                      MdiIcons.chevronRight,
-                      size: 30,
-                    ),
+                    leading: Icon(MdiIcons.chevronRight, size: 30),
                     title: Text(questioName, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
                     tileColor: Colors.white,
                     style: ListTileStyle.drawer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     horizontalTitleGap: 6,
                     minLeadingWidth: 0,
                     minVerticalPadding: 0,

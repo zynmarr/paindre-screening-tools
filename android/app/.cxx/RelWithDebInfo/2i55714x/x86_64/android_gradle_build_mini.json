@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "C:\\flutter\\flutter_windows_3.19.6-stable\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\mukhl\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\mukhl\\OneDrive\\Documents\\Amar\\Projects\\PAINDRE-SCREENING-TOOLS\\paindre-screening-tools\\android\\app\\.cxx\\RelWithDebInfo\\2i55714x\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\mukhl\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\mukhl\\OneDrive\\Documents\\Amar\\Projects\\PAINDRE-SCREENING-TOOLS\\paindre-screening-tools\\android\\app\\.cxx\\RelWithDebInfo\\2i55714x\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

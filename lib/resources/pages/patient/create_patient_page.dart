@@ -1,8 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:ui' as ui;
+import 'package:provider/provider.dart';
 import 'package:screening_tools_android/app/controllers/patient/patient.dart';
+import 'package:screening_tools_android/app/controllers/service/service_controller.dart';
+import 'package:screening_tools_android/app/routes/routes.dart';
+import 'package:screening_tools_android/app/utils/utils.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
+import 'package:screening_tools_android/resources/pages/question/question_page.dart';
 
 class CreatePatientPage extends StatefulWidget {
   const CreatePatientPage({super.key});
@@ -13,410 +19,289 @@ class CreatePatientPage extends StatefulWidget {
 
 class _CreatePatientPageState extends State<CreatePatientPage> {
   final formKey = GlobalKey<FormState>();
-  TextEditingController nameC = TextEditingController();
-  TextEditingController ageC = TextEditingController();
-  TextEditingController phoneC = TextEditingController(text: '0');
-  TextEditingController genderC = TextEditingController();
-  TextEditingController resPersonC = TextEditingController();
-  FocusNode nameFocus = FocusNode();
-  FocusNode ageFocus = FocusNode();
-  FocusNode phoneFocus = FocusNode();
-  FocusNode genderFocus = FocusNode();
-  FocusNode resPersonFocus = FocusNode();
+  User? user = FirebaseAuth.instance.currentUser;
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController(text: '0');
+  final TextEditingController diagnostiController = TextEditingController(text: 'Kosong');
+  String? selectedGender;
+  final TextEditingController examinerNameController = TextEditingController();
+
+  final FocusNode fullNameFocus = FocusNode();
+  final FocusNode ageFocus = FocusNode();
+  final FocusNode phoneFocus = FocusNode();
+  final FocusNode diagnosticFocus = FocusNode();
+  final FocusNode genderFocus = FocusNode();
+  final FocusNode examinerNameFocus = FocusNode();
+
+  CollectionReference featuresDoc = FirebaseFirestore.instance.collection('features');
+
+  bool isPhoneActivated = false;
+  bool isDiagnosticActivated = false;
+  bool isResponsiblePersonActivated = false;
+
+  String formTitleName = 'form.patient.header'.tr;
+
+  @override
+  void initState() {
+    super.initState();
+
+    featuresDoc.doc('form_phone').get().then((value) {
+      Map<String, dynamic> data = value.data() as Map<String, dynamic>;
+      if (data.isNotEmpty) {
+        setState(() {
+          isPhoneActivated = data['is_activated'] ?? false;
+        });
+      }
+    });
+
+    featuresDoc.doc('form_diagnostic').get().then((value) {
+      Map<String, dynamic> data = value.data() as Map<String, dynamic>;
+      if (data.isNotEmpty) {
+        setState(() {
+          isDiagnosticActivated = data['is_activated'] ?? false;
+        });
+      }
+    });
+
+    featuresDoc.doc('form_responsible_person').get().then((value) {
+      Map<String, dynamic> data = value.data() as Map<String, dynamic>;
+      if (data.isNotEmpty) {
+        setState(() {
+          isResponsiblePersonActivated = data['is_activated'] ?? false;
+        });
+      }
+    });
+
+    // featuresDoc.doc('form_examination').get().then((value) {
+    //   Map<String, dynamic> data = value.data() as Map<String, dynamic>;
+    //   if (data.isNotEmpty) {
+    //     setState(() {
+    //       formTitleName = data['title'] ?? "Form Pemeriksaan";
+    //     });
+    //   }
+    // });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fullNameController.text = user?.displayName ?? '';
+    examinerNameController.text = user?.displayName ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: context.height,
-      decoration: BoxDecoration(color: Colors.grey[200]),
-      child: Stack(
-        children: [
-          Positioned(
-            bottom: 0,
-            child: CustomPaint(
-              size: Size(context.width, context.height / 2.6),
-              painter: RPSCustomPainter(),
+    ServiceController serviceController = context.watch<ServiceController>();
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      // backgroundColor: Colors.grey[300],
+      body: SizedBox(
+        height: context.height,
+        child: Stack(
+          children: [
+            Positioned(
+              left: -1,
+              right: -2,
+              bottom: 0,
+              child: CustomPaint(size: Size(context.width, context.height / 1.9), painter: RPSCustomPainter1()),
             ),
-          ),
-          Scaffold(
-            backgroundColor: Colors.transparent,
-            // appBar: cAppBar(
-            //   context,
-            //   title: "Tambah Pasien Baru",
-            //   centerTitle: true,
-            //   leading: GestureDetector(
-            //     onTap: () => Get.back(),
-            //     child: Icon(
-            //       MdiIcons.chevronLeft,
-            //       size: 20,
-            //     ),
-            //   ),
-            // ),
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 80,
-                  ),
-                  Form(
-                    key: formKey,
-                    child: Container(
-                      width: context.width,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 25),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Text(
-                            'Create new patient'.toUpperCase(),
-                            textAlign: TextAlign.left,
-                            style: context.textTheme.titleLarge!
-                                .copyWith(fontWeight: FontWeight.bold, color: Colors.blue[800]),
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 18)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Nama Lengkap",
-                                style: context.textTheme.bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 4)),
-                              TextFormField(
-                                controller: nameC,
-                                focusNode: nameFocus,
-                                style: context.textTheme.bodyMedium,
-                                keyboardType: TextInputType.text,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Nama lengkap tidak boleh kosong';
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                decoration: cInputDecoration(context,
-                                    hintText: 'Masukkan nama lengkap'),
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 6)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Umur",
-                                style: context.textTheme.bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                              ),
-                              TextFormField(
-                                controller: ageC,
-                                focusNode: ageFocus,
-                                style: context.textTheme.bodyMedium,
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Umur tidak boleh kosong';
-                                  } else if (value.isNumericOnly) {
-                                    return null;
-                                  } else {
-                                    return 'Umur harus angka';
-                                  }
-                                },
-                                decoration: cInputDecoration(context,
-                                    hintText: 'Masukkan Umur'),
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 6)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "No Telepon",
-                                style: context.textTheme.bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                              ),
-                              TextFormField(
-                                controller: phoneC,
-                                focusNode: phoneFocus,
-                                style: context.textTheme.bodyMedium,
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return null;
-                                  } else {
-                                    if (value.isNumericOnly) {
-                                      return null;
-                                    } else {
-                                      return 'No telepon harus angka';
-                                    }
-                                  }
-                                },
-                                decoration: cInputDecoration(context,
-                                    hintText: 'Masukkan no telepon'),
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 6)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Jenis Kelamin",
-                                style: context.textTheme.bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4),
-                              ),
-                              DropdownButtonFormField(
-                                value: genderC.text,
-                                dropdownColor: Colors.white,
-                                items: [
-                                  DropdownMenuItem(
-                                      value: '',
-                                      child: Text('Pilih jenis kelamin',
-                                          style: context.textTheme.bodyMedium)),
-                                  DropdownMenuItem(
-                                      value: 'male',
-                                      child: Text('Laki',
-                                          style: context.textTheme.bodyMedium)),
-                                  DropdownMenuItem(
-                                      value: 'female',
-                                      child: Text('Perempuan',
-                                          style: context.textTheme.bodyMedium)),
-                                ],
-                                validator: (value) {
-                                  if (value == '') {
-                                    return 'Pilih jenis kelamin';
-                                  }
-                                  return null;
-                                },
-                                decoration: cInputDecoration(context,
-                                    hintText: "Jenis Kelamin"),
-                                onChanged: (val) {
-                                  if (val != null) {
-                                    setState(() {
-                                      genderC.text = val;
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 6)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Nama Pemeriksa",
-                                style: context.textTheme.bodyLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 4)),
-                              TextFormField(
-                                controller: resPersonC,
-                                focusNode: resPersonFocus,
-                                style: context.textTheme.bodyMedium,
-                                keyboardType: TextInputType.text,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Nama pemeriksa tidak boleh kosong';
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                                decoration: cInputDecoration(context,
-                                    hintText: 'Masukkan nama pemeriksa'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+            Positioned(
+              left: -2,
+              right: -2,
+              bottom: -2,
+              child: CustomPaint(size: Size(context.width, context.height / 2.0), painter: RPSCustomPainter2()),
+            ),
+            SizedBox(
+              height: context.height,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    SizedBox(height: 80),
+                    Text(
+                      formTitleName.toUpperCase(),
+                      textAlign: TextAlign.left,
+                      style: context.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.blue[800]),
                     ),
-                  ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                  SizedBox(
-                    width: context.width / 3,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        FocusScope.of(context).unfocus();
-                        if (formKey.currentState!.validate()) {
-                          cDialog(
-                            context,
-                            middleText: "Apakah anda yakin menyimpan data ini?",
-                            onSucces: () {
-                              Get.back();
-                              Patient data = Patient(
-                                  id: "1",
-                                  name: nameC.text,
-                                  age: ageC.text,
-                                  gender: genderC.text,
-                                  phone: phoneC.text,
-                                  responsiblePerson: resPersonC.text,
-                                  createdAt: DateTime.now().toString());
-
-                              PatientController().create(data).then(
-                                    (value) => Get.offNamed(
-                                      'question-page',
-                                      arguments: {
-                                        'questioName': 'Nyeri Nosiseptif',
-                                        'id_patient': value.id
-                                      },
-                                    ),
-                                  );
-                            },
-                            onCancel: () => Get.back(),
-                          );
-                        }
-                      },
-                      child: Text(
-                        'Simpan'.toUpperCase(),
-                        style: context.textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 4)],
+                      ),
+                      child: Form(
+                        key: formKey,
+                        child: Container(
+                          width: context.width,
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              cTextField(
+                                label: 'form.patient.name'.tr,
+                                controller: fullNameController,
+                                focusNode: fullNameFocus,
+                                keyboardType: TextInputType.text,
+                                hintText: 'hint.name'.tr,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
+                                ),
+                              ),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              cTextField(
+                                label: 'form.patient.age'.tr,
+                                controller: ageController,
+                                focusNode: ageFocus,
+                                keyboardType: TextInputType.number,
+                                hintText: 'hint.age'.tr,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
+                                ),
+                              ),
+                              if (isPhoneActivated || serviceController.role == Roles.admin)
+                                const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              if (isPhoneActivated || serviceController.role == Roles.admin)
+                                cTextField(
+                                  label: 'form.patient.phone'.tr,
+                                  controller: phoneController,
+                                  focusNode: phoneFocus,
+                                  keyboardType: TextInputType.number,
+                                  hintText: 'hint.phone'.tr,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
+                                  ),
+                                ),
+                              if (isDiagnosticActivated) const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              if (isDiagnosticActivated)
+                                cTextField(
+                                  label: 'form.patient.diagnosis'.tr,
+                                  controller: diagnostiController,
+                                  focusNode: diagnosticFocus,
+                                  keyboardType: TextInputType.text,
+                                  hintText: 'Masukkan diagnosa',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
+                                  ),
+                                ),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              _buildGenderDropdown(),
+                              if (isPhoneActivated || isResponsiblePersonActivated) const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              if (isPhoneActivated || isResponsiblePersonActivated)
+                                cTextField(
+                                  label: 'form.patient.examinerName'.tr,
+                                  controller: examinerNameController,
+                                  focusNode: examinerNameFocus,
+                                  keyboardType: TextInputType.text,
+                                  hintText: 'hint.examinerName'.tr,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                    SizedBox(
+                      width: context.width / 3,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          FocusScope.of(context).unfocus();
+                          if (formKey.currentState!.validate()) {
+                            cDialog(
+                              context,
+                              middleText: 'dialog.save'.tr,
+                              onSucces: () async {
+                                Patient patientData = Patient(
+                                  id: "1",
+                                  name: fullNameController.text,
+                                  age: ageController.text,
+                                  gender: selectedGender ?? '',
+                                  phone: phoneController.text,
+                                  responsiblePerson: examinerNameController.text,
+                                  diagnostic: diagnostiController.text,
+                                  userID: user?.uid ?? '',
+                                  createdAt: DateTime.now().toString(),
+                                );
+                                Utils.paindreShowLoading();
+                                await PatientController().create(patientData).then((value) {
+                                  Get.offAllNamed(
+                                    Routes.question,
+                                    arguments: QuestionArguments(question: "Nyeri Nosiseptif", patient: value),
+                                    predicate: (route) => route.settings.name == Routes.home,
+                                  );
+                                });
+                              },
+                              onCancel: () => Get.back(),
+                            );
+                          }
+                        },
+                        child: Text(
+                          'button.save'.tr.toUpperCase(),
+                          style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-}
 
-class RPSCustomPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Layer 1
-
-    Paint paintFill0 = Paint()
-      ..color = Colors.blue
-      ..style = PaintingStyle.fill
-      ..strokeWidth = size.width * 0.00
-      ..strokeCap = StrokeCap.butt
-      ..strokeJoin = StrokeJoin.miter;
-
-    Path path_0 = Path();
-    path_0.moveTo(size.width * -0.0008083, size.height * 0.6668000);
-    path_0.quadraticBezierTo(size.width * 0.0883083, size.height * 0.4908917,
-        size.width * 0.2094333, size.height * 0.5242083);
-    path_0.cubicTo(
-        size.width * 0.3584667,
-        size.height * 0.5569583,
-        size.width * 0.3254833,
-        size.height * 0.3965750,
-        size.width * 0.4970917,
-        size.height * 0.2371417);
-    path_0.cubicTo(
-        size.width * 0.5751000,
-        size.height * 0.1720167,
-        size.width * 0.6197083,
-        size.height * 0.2181083,
-        size.width * 0.7156833,
-        size.height * 0.2309167);
-    path_0.cubicTo(
-        size.width * 0.8009250,
-        size.height * 0.2538917,
-        size.width * 0.7792667,
-        size.height * 0.2206167,
-        size.width * 0.8350833,
-        size.height * 0.1545583);
-    path_0.quadraticBezierTo(size.width * 0.8976583, size.height * 0.0880500,
-        size.width, size.height * 0.0822000);
-    path_0.lineTo(size.width * 1.0008333, size.height * 1.0016667);
-    path_0.lineTo(size.width * -0.0008333, size.height * 0.9983333);
-    path_0.lineTo(size.width * -0.0008083, size.height * 0.6668000);
-    path_0.close();
-
-    canvas.drawPath(path_0, paintFill0);
+  Text formTitle({required String title}) {
+    return Text(title, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold));
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class RPSCustomPainter2 extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Layer 1
-
-    Paint paintFill0 = Paint()
-      // ..color = Colors.green
-      ..shader = ui.Gradient.linear(
-        Offset(size.width / 1, 2),
-        Offset(0, size.height / 1.4),
-        [
-          const Color.fromARGB(255, 20, 112, 187),
-          Colors.blue[800]!,
-        ],
-      )
-      ..style = PaintingStyle.fill
-      ..strokeWidth = size.width * 0.00
-      ..strokeCap = StrokeCap.butt
-      ..strokeJoin = StrokeJoin.miter;
-
-    Path path_0 = Path();
-    path_0.moveTo(size.width * -0.0002250, size.height * 0.2984600);
-    path_0.quadraticBezierTo(
-        size.width * -0.0002250, size.height * 0.8617100, 0, size.height);
-    path_0.lineTo(size.width, size.height);
-    path_0.quadraticBezierTo(size.width * 1.0008333, size.height * 0.3357500,
-        size.width * 1.0008333, size.height * 0.0980000);
-    path_0.cubicTo(
-        size.width * 0.8303833,
-        size.height * 0.0811500,
-        size.width * 0.6094583,
-        size.height * 0.0033600,
-        size.width * 0.4998500,
-        size.height * 0.1008400);
-    path_0.cubicTo(
-        size.width * 0.3566167,
-        size.height * 0.2435400,
-        size.width * 0.3990000,
-        size.height * 0.2509500,
-        size.width * -0.0002250,
-        size.height * 0.2984600);
-    path_0.close();
-
-    canvas.drawPath(path_0, paintFill0);
-
-    // Layer 1
-
-    Paint paintStroke0 = Paint()
-      ..color = const Color.fromARGB(204, 33, 150, 243)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.00
-      ..strokeCap = StrokeCap.butt
-      ..strokeJoin = StrokeJoin.miter;
-
-    canvas.drawPath(path_0, paintStroke0);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+  Widget _buildGenderDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        formTitle(title: 'form.patient.gender'.tr),
+        const Padding(padding: EdgeInsets.symmetric(vertical: 4)),
+        DropdownButtonFormField<String>(
+          value: selectedGender,
+          dropdownColor: Colors.white,
+          items: [
+            DropdownMenuItem(value: null, child: Text('select.gender'.tr, style: context.textTheme.bodyMedium)),
+            DropdownMenuItem(value: 'male', child: Text('man'.tr, style: context.textTheme.bodyMedium)),
+            DropdownMenuItem(value: 'female', child: Text('woman'.tr, style: context.textTheme.bodyMedium)),
+          ],
+          validator: (value) {
+            if (value == null) {
+              return 'select.gender'.tr;
+            }
+            return null;
+          },
+          decoration: cInputDecoration(
+            hintText: 'form.patient.gender'.tr,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
+            ),
+          ),
+          onChanged: (val) {
+            setState(() {
+              selectedGender = val;
+            });
+          },
+        ),
+      ],
+    );
   }
 }

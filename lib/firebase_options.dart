@@ -1,12 +1,8 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    if (kIsWeb) {
-      return web;
-    }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
@@ -28,28 +24,16 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions are not supported for this platform.',
-        );
+        throw UnsupportedError('DefaultFirebaseOptions are not supported for this platform.');
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCyGADhg1Scvv3yKBCKxQ39xrSB0GbeK4Y',
-    appId: '1:414832348965:web:fb49bc20cf955f5d4dd4cc',
-    messagingSenderId: '414832348965',
-    projectId: 'paindre-screening-tools',
-    authDomain: 'paindre-screening-tools.firebaseapp.com',
-    storageBucket: 'paindre-screening-tools.firebasestorage.app',
-    measurementId: 'G-4B76819TG4',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAHtq3ijkoVxjVhEqgl-mlMHDc-g74-bH4',
-    appId: '1:414832348965:android:53ca9df0ce10e91e4dd4cc',
-    messagingSenderId: '414832348965',
-    projectId: 'paindre-screening-tools',
-    storageBucket: 'paindre-screening-tools.firebasestorage.app',
+    apiKey: 'AIzaSyAp2l3jzUBRL2tQFIaKFOMvS_4Baln9IG8',
+    appId: '1:1009083053499:android:ff5e8f39324acb7da3c09e',
+    messagingSenderId: '1009083053499',
+    projectId: 'paindre-screening-tools-d014e',
+    storageBucket: 'paindre-screening-tools-d014e.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -57,8 +41,7 @@ class DefaultFirebaseOptions {
     appId: '1:414832348965:ios:ac029738dffe2dc94dd4cc',
     messagingSenderId: '414832348965',
     projectId: 'paindre-screening-tools',
-    storageBucket: 'paindre-screening-tools.firebasestorage.app',
+    storageBucket: 'paindre-screening-tools-d014e.firebasestorage.app',
     iosBundleId: 'com.paindreinnovation.screeningToolsAndroid',
   );
-
 }

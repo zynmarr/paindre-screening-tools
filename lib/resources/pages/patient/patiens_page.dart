@@ -1,92 +1,90 @@
-import 'dart:developer';
-
-import 'package:bot_toast/bot_toast.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
 import 'package:screening_tools_android/app/controllers/patient/patient.dart';
-// import 'package:screening_tools_android/app/core/core.dart';
-import 'package:screening_tools_android/app/utils/utils.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
 
+class PatientArguments {
+  final bool isHistory;
+  PatientArguments({required this.isHistory});
+}
+
 class PatientPage extends StatefulWidget {
-  const PatientPage({super.key});
+  final bool isHistory;
+  const PatientPage({super.key, required this.isHistory});
 
   @override
   State<PatientPage> createState() => _PatientPageState();
 }
 
 class _PatientPageState extends State<PatientPage> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: cAppBar(
-        context,
-        title: "Data Pasien",
+        title: widget.isHistory ? 'screeningData'.tr : 'patientData'.tr,
         centerTitle: true,
-        actions: [
-          // IconButton(
-          //   onPressed: () =>
-          //       showSearch(context: context, delegate: CustomSearchDelegate()),
-          //   icon: const Icon(Icons.search),
-          // )
-        ],
-        leading: GestureDetector(
-          onTap: () => Get.back(),
-          child: Icon(
-            MdiIcons.chevronLeft,
-            size: 20,
-          ),
-        ),
+        leading: GestureDetector(onTap: () => Get.back(), child: Icon(MdiIcons.chevronLeft, size: 20)),
       ),
-      body: Container(
-        height: context.height,
-        width: context.width,
-        decoration: BoxDecoration(
-          gradient: cGradient(context),
-        ),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            log("refresh");
-          },
-          child: StreamBuilder(
-              // padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-              stream: PatientController().patients.snapshots(),
+      body: Stack(
+        children: [
+          Positioned(
+            left: -1,
+            right: -2,
+            bottom: 0,
+            child: CustomPaint(size: Size(context.width, context.height / 1.9), painter: RPSCustomPainter1()),
+          ),
+          Positioned(
+            left: -2,
+            right: -2,
+            bottom: -2,
+            child: CustomPaint(size: Size(context.width, context.height / 2.0), painter: RPSCustomPainter2()),
+          ),
+          SizedBox(
+            height: context.height,
+            width: context.width,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: widget.isHistory ? PatientController().patients.where('user_id', isEqualTo: user!.uid).snapshots() : PatientController().patients.orderBy('created_at').snapshots(),
               builder: (context, snapshot) {
-                // print(snapshot.data!.docs[0].data());
                 if (snapshot.hasError) {
-                  Utils.paindreShowLoading();
-                  Utils.errorToast(message: "Terjadi kesalahan, silahkan coba lagi");
-                }
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  Utils.paindreShowLoading();
-                }
-
-                // return SizedBox.shrink();
-
-                if (snapshot.hasData) {
-                  BotToast.closeAllLoading();
-                  
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 15),
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) => patientCard(context,
-                        patient: Patient.fromMap(snapshot.data!.docs[index]
-                            .data() as Map<String, dynamic>)),
+                  return Center(
+                    child: Text(
+                      "Terjadi kesalahan, silahkan coba lagi",
+                      style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
+                    ),
                   );
-                } else {
-                  return SizedBox.shrink();
                 }
-              }),
-        ),
+
+                if (snapshot.connectionState == ConnectionState.waiting) return Center(child: cLoading());
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Text(
+                    "Belum ada data pemeriksaan",
+                    style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
+                  );
+                }
+
+                // Data tersedia, tampilkan ListView
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> patientData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                    patientData['user_id'] = patientData['user_id'] ?? '';
+                    patientData['diagnostic'] = patientData['diagnostic'] ?? 'Kosong';
+
+                    return patientCard(context, patient: Patient.fromMap(patientData));
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

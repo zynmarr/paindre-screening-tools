@@ -1,42 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:screening_tools_android/app/controllers/patient/patient.dart';
 import 'package:screening_tools_android/app/controllers/question/question.dart';
-import 'package:screening_tools_android/app/utils/utils.dart';
+import 'package:screening_tools_android/app/routes/routes.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
+import 'package:screening_tools_android/resources/pages/question/score_page.dart';
+
+class QuestionArguments {
+  final String question;
+  final Patient patient;
+
+  QuestionArguments({required this.question, required this.patient});
+}
 
 class QuestionPage extends StatefulWidget {
-  const QuestionPage({super.key});
+  final String question;
+  final Patient patient;
+  const QuestionPage({super.key, required this.question, required this.patient});
 
   @override
   State<QuestionPage> createState() => _QuestionPageState();
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-  String questioName = Get.arguments['questioName'];
-  String idPatient = Get.arguments['id_patient'];
-
   int sbjScore = 0;
   int peScore = 0;
 
   List questionSbj = [];
   List questionPE = [];
 
+  String barTitle = 'pain.nociceptive'.tr;
+
   @override
   void initState() {
-    questionSbj = questions.where((element) => element.name == questioName && element.type == 'Subjective').map((e) => {'quest': e.toMap(), 'value': ''}).toList();
-    questionPE = questions.where((element) => element.name == questioName && element.type == 'Physical examination').map((e) => {'quest': e.toMap(), 'value': ''}).toList();
+    if (widget.question == 'Nyeri Nosiceptive' || widget.question == 'pain.nociceptive') {
+      barTitle = 'pain.nociceptive'.tr;
+    } else if (widget.question == 'Nyeri Neuropatik' || widget.question == 'pain.neuropathic') {
+      barTitle = 'pain.neuropathic'.tr;
+    } else if (widget.question == 'Nyeri Sensitisasi Sentral' || widget.question == 'pain.centralSensitization') {
+      barTitle = 'pain.centralSensitization'.tr;
+    }
+
+    questionSbj =
+        questions
+            .where((element) => element.name == widget.question && element.type == 'Subjective')
+            .map((e) => {'quest': e.toMap(), 'value': ''})
+            .toList();
+    questionPE =
+        questions
+            .where((element) => element.name == widget.question && element.type == 'Physical examination')
+            .map((e) => {'quest': e.toMap(), 'value': ''})
+            .toList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // ignore: deprecated_member_use
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      onPopInvokedWithResult: (didpop, result) {
         final dialog = cDialog(
           context,
-          middleText: "Apakah anda yakin ingin keluar dari halaman ini?",
+          middleText: 'dialog.exitPage'.tr,
           onSucces: () => Get.offAllNamed('home-page'),
           onCancel: () => Get.back(),
         );
@@ -44,7 +69,7 @@ class _QuestionPageState extends State<QuestionPage> {
         return dialog;
       },
       child: Scaffold(
-        appBar: cAppBar(context, title: questioName, centerTitle: true),
+        appBar: cAppBar(title: barTitle, centerTitle: true),
         body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
           child: Column(
@@ -52,13 +77,14 @@ class _QuestionPageState extends State<QuestionPage> {
               Container(
                 width: context.width,
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [BoxShadow(offset: Offset(1, 2), color: Colors.black45, blurRadius: 4)],
+                ),
                 child: Column(
                   children: [
-                    Text(
-                      'Pemeriksaan Subjektif',
-                      style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    Text('questions.type.1'.tr, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 14),
                     for (var questionSub in questionSbj)
                       Container(
@@ -69,10 +95,7 @@ class _QuestionPageState extends State<QuestionPage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  questionSub['quest']['title'],
-                                  maxLines: 10,
-                                ),
+                                Text(questionSub['quest']['title'], maxLines: 10),
                                 const SizedBox(height: 4),
                                 Text(
                                   questionSub['quest']['subTitle'],
@@ -90,7 +113,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                       setState(() {
                                         questionSub['value'] = true;
                                         sbjScore += 1;
-                                        print(sbjScore);
+                                        debugPrint(sbjScore.toString());
                                       });
                                     }
                                   },
@@ -104,14 +127,10 @@ class _QuestionPageState extends State<QuestionPage> {
                                     child: Row(
                                       children: [
                                         if (questionSub['value'] == true)
-                                          Icon(
-                                            MdiIcons.check,
-                                            size: context.textTheme.bodyMedium!.fontSize,
-                                            color: Colors.white,
-                                          ),
+                                          Icon(MdiIcons.check, size: context.textTheme.bodyMedium!.fontSize, color: Colors.white),
                                         if (questionSub['value'] == true) const SizedBox(width: 4),
                                         Text(
-                                          'Iya',
+                                          'yes'.tr,
                                           style: context.textTheme.bodyMedium!.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: questionSub['value'] == true ? Colors.white : Colors.green[700],
@@ -130,7 +149,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                           sbjScore -= 1;
                                         }
                                         questionSub['value'] = false;
-                                        print(sbjScore);
+                                        debugPrint(sbjScore.toString());
                                       });
                                     }
                                   },
@@ -144,14 +163,10 @@ class _QuestionPageState extends State<QuestionPage> {
                                     child: Row(
                                       children: [
                                         if (questionSub['value'] == false)
-                                          Icon(
-                                            MdiIcons.close,
-                                            size: context.textTheme.bodyMedium!.fontSize,
-                                            color: Colors.white,
-                                          ),
+                                          Icon(MdiIcons.close, size: context.textTheme.bodyMedium!.fontSize, color: Colors.white),
                                         if (questionSub['value'] == false) const SizedBox(width: 4),
                                         Text(
-                                          'Tidak',
+                                          'no'.tr,
                                           style: context.textTheme.bodyMedium!.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: questionSub['value'] == false ? Colors.white : Colors.red,
@@ -173,13 +188,14 @@ class _QuestionPageState extends State<QuestionPage> {
               Container(
                 width: context.width,
                 padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [BoxShadow(offset: Offset(1, 2), color: Colors.black45, blurRadius: 4)],
+                ),
                 child: Column(
                   children: [
-                    Text(
-                      'Pemeriksaan Fisik',
-                      style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    Text('questions.type.2'.tr, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 14),
                     for (var questionSub in questionPE)
                       Container(
@@ -206,7 +222,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                       setState(() {
                                         questionSub['value'] = true;
                                         peScore += 1;
-                                        print(peScore);
+                                        debugPrint(peScore.toString());
                                       });
                                     }
                                   },
@@ -220,14 +236,10 @@ class _QuestionPageState extends State<QuestionPage> {
                                     child: Row(
                                       children: [
                                         if (questionSub['value'] == true)
-                                          Icon(
-                                            MdiIcons.check,
-                                            size: context.textTheme.bodyMedium!.fontSize,
-                                            color: Colors.white,
-                                          ),
+                                          Icon(MdiIcons.check, size: context.textTheme.bodyMedium!.fontSize, color: Colors.white),
                                         if (questionSub['value'] == true) const SizedBox(width: 4),
                                         Text(
-                                          'Iya',
+                                          'yes'.tr,
                                           style: context.textTheme.bodyMedium!.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: questionSub['value'] == true ? Colors.white : Colors.green[700],
@@ -246,7 +258,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                           peScore -= 1;
                                         }
                                         questionSub['value'] = false;
-                                        print(peScore);
+                                        debugPrint(peScore.toString());
                                       });
                                     }
                                   },
@@ -260,14 +272,10 @@ class _QuestionPageState extends State<QuestionPage> {
                                     child: Row(
                                       children: [
                                         if (questionSub['value'] == false)
-                                          Icon(
-                                            MdiIcons.close,
-                                            size: context.textTheme.bodyMedium!.fontSize,
-                                            color: Colors.white,
-                                          ),
+                                          Icon(MdiIcons.close, size: context.textTheme.bodyMedium!.fontSize, color: Colors.white),
                                         if (questionSub['value'] == false) const SizedBox(width: 4),
                                         Text(
-                                          'Tidak',
+                                          'no'.tr,
                                           style: context.textTheme.bodyMedium!.copyWith(
                                             fontWeight: FontWeight.bold,
                                             color: questionSub['value'] == false ? Colors.white : Colors.red[700],
@@ -292,15 +300,17 @@ class _QuestionPageState extends State<QuestionPage> {
                   onPressed: () async {
                     cDialog(
                       context,
-                      middleText: "Apakah anda sudah yakin?",
-                      onSucces: () => Utils.goToNextPage('score-page', arguments: {'sbj_score': sbjScore, 'pe_score': peScore, 'name': questioName, 'id_patient': idPatient}),
+                      middleText: 'dialog.sure'.tr,
+                      onSucces:
+                          () => Get.offAllNamed(
+                            Routes.score,
+                            arguments: ScoreArguments(question: widget.question, patient: widget.patient, sbjScore: sbjScore, peScore: peScore),
+                            predicate: (route) => route.settings.name == Routes.home,
+                          ),
                       onCancel: () => Get.back(),
                     );
                   },
-                  child: Text(
-                    'Periksa Hasil',
-                    style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
+                  child: Text('button.checkResult'.tr, style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ],

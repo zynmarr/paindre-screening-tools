@@ -1,73 +1,61 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:screening_tools_android/app/exceptions/handler.dart';
-import 'package:screening_tools_android/app/utils/utils.dart';
-
-part 'scoring_result_controller.dart';
 class ScoringResult {
-  String id;
   String type;
   String value;
-  String idPatient;
+  String createdAt;
   ScoringResult({
-    required this.id,
     required this.type,
     required this.value,
-    required this.idPatient,
+    required this.createdAt,
   });
 
   ScoringResult copyWith({
-    String? id,
     String? type,
     String? value,
-    String? idPatient,
+    String? createdAt,
   }) {
     return ScoringResult(
-      id: id ?? this.id,
       type: type ?? this.type,
       value: value ?? this.value,
-      idPatient: idPatient ?? this.idPatient,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    return <String, dynamic>{
       'type': type,
       'value': value,
-      'id_patient': idPatient,
+      'createdAt': createdAt,
     };
   }
 
   factory ScoringResult.fromMap(Map<String, dynamic> map) {
     return ScoringResult(
-      id: map['id'] ?? 0,
-      type: map['type'] ?? '',
-      value: map['value'] ?? '',
-      idPatient: map['id_patient'] ?? '',
+      type: map['type'] as String,
+      value: map['value'] as String,
+      createdAt: map['createdAt'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory ScoringResult.fromJson(String source) => ScoringResult.fromMap(json.decode(source));
+  factory ScoringResult.fromJson(String source) => ScoringResult.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'ScoringResult(id: $id, type: $type, value: $value, id_patient: $idPatient)';
+  String toString() => 'ScoringResult(type: $type, value: $value, createdAt: $createdAt)';
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(covariant ScoringResult other) {
     if (identical(this, other)) return true;
   
-    return other is ScoringResult &&
-      other.id == id &&
+    return 
       other.type == type &&
       other.value == value &&
-      other.idPatient == idPatient;
+      other.createdAt == createdAt;
   }
 
   @override
-  int get hashCode => id.hashCode ^ type.hashCode ^ value.hashCode ^ idPatient.hashCode;
+  int get hashCode => type.hashCode ^ value.hashCode ^ createdAt.hashCode;
 }
