@@ -24,14 +24,28 @@ class NotificationService {
     await setupFlutternotification();
     await setupMessageHandlers();
 
-    final token = await _messaging.getToken();
+    // final token = await _messaging.getToken();
     // debugPrint('FCM Token: $token');
   }
 
   Future<void> _requestPermission() async {
+    // Meminta izin untuk notifikasi
     NotificationSettings settings = await _messaging.requestPermission(alert: true, badge: true, provisional: false, sound: true);
 
-    // debugPrint('User granted permission: ${settings.authorizationStatus}');
+    // Memeriksa status izin yang diberikan
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // Izin diberikan, Anda dapat menampilkan notifikasi
+      debugPrint("Izin notifikasi diberikan.");
+      // Tambahkan logika untuk mengatur notifikasi di sini
+    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+      // Izin sementara diberikan, Anda dapat menampilkan notifikasi dengan batasan
+      debugPrint("Izin notifikasi sementara diberikan.");
+      // Tambahkan logika untuk mengatur notifikasi sementara di sini
+    } else {
+      // Izin ditolak
+      debugPrint("Izin notifikasi ditolak.");
+      // Tambahkan logika untuk menangani penolakan izin di sini
+    }
   }
 
   Future<void> setupFlutternotification() async {
@@ -72,6 +86,8 @@ class NotificationService {
         importance: Importance.high,
         priority: Priority.high,
         ticker: 'ticker',
+        icon: '@mipmap/ic_launcher',
+        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
       );
 
       final platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -114,7 +130,6 @@ class NotificationService {
     if (message.data['type'] == 'chat') {
       // debugPrint('Key and value background message: ${message.data}');
       // Handle chat message
-      
     }
     // debugPrint('Key and value background message: ${message.data}');
   }

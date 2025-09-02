@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
                     if (option['maintanance_mode'] == true) {
-                      Future.delayed(Duration(seconds: 2), () => Get.offAllNamed(Routes.maintanance));
+                      Future.delayed(Duration(seconds: 1), () => Get.offAllNamed(Routes.maintanance));
                     }
                   }
 

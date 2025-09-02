@@ -23,7 +23,7 @@ class _MaintanancePageState extends State<MaintanancePage> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             Utils.paindreShowLoading();
-            Utils.errorToast(message: "Terjadi kesalahan, silahkan coba lagi");
+            Utils.errorToast(message: 'error.message.unknown'.tr);
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -52,7 +52,7 @@ class _MaintanancePageState extends State<MaintanancePage> {
                 Container(
                   alignment: Alignment.center,
                   child: Text(
-                    'Server sedang dalam perbaikan, silahkan kembali lagi nanti...',
+                    'text.maintenanceMode'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: Colors.grey[700], fontWeight: FontWeight.bold),
                   ),
@@ -61,7 +61,10 @@ class _MaintanancePageState extends State<MaintanancePage> {
                 SizedBox(
                   width: context.width / 1.8,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      BotToast.showLoading();
+                      setState(() {});
+                    },
                     child: Text(
                       'Refresh'.toUpperCase(),
                       style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),

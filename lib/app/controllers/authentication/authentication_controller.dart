@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -52,7 +51,7 @@ class AuthController {
 
       return user; // Mengembalikan user jika login berhasil
     } on FirebaseAuthException catch (error) {
-      debugPrint(error.toString());
+      // debugPrint(error.toString());
       // Menangani kesalahan spesifik dari Firebase
       if (error.code == 'user-not-found') {
         return Future.error('error.message.userNotFound'.tr);
@@ -88,23 +87,39 @@ class AuthController {
     }
   }
 
-  Future<void> checkUserRole() async {
-    User? user = FirebaseAuth.instance.currentUser;
+  // Future<void> checkUserRole() async {
+  //   User? user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      // Ambil token ID untuk mendapatkan custom claims
-      IdTokenResult tokenResult = await user.getIdTokenResult();
+  //   if (user != null) {
+  //     // create a user document if it doesn't exist
+  //     DocumentReference userDoc = userCollection.doc(user.uid);
+  //     DocumentSnapshot userSnapshot = await userDoc.get();
+  //     if (!userSnapshot.exists) {
+  //       await userDoc.set({
+  //         'uid': user.uid,
+  //         'email': user.email,
+  //         'displayName': user.displayName,
+  //         'photoURL': user.photoURL,
+  //         'role': 'user', // Default role
+  //       });
+  //     } else {
+        
 
-      // Periksa custom claims
-      if (tokenResult.claims != null && tokenResult.claims!['role'] == 'admin') {
-        debugPrint('User is an admin');
-        debugPrint(tokenResult.toString());
-        // Lakukan sesuatu untuk admin
-      } else {
-        debugPrint(tokenResult.toString());
-        debugPrint('User is not an admin');
-        // Lakukan sesuatu untuk pengguna biasa
-      }
-    }
-  }
+  //     }
+
+  //     // Ambil token ID untuk mendapatkan custom claims
+  //     IdTokenResult tokenResult = await user.getIdTokenResult();
+
+  //     // Periksa custom claims
+  //     if (tokenResult.claims != null && tokenResult.claims!['role'] == 'admin') {
+  //       debugPrint('User is an admin');
+  //       debugPrint(tokenResult.toString());
+  //       // Lakukan sesuatu untuk admin
+  //     } else {
+  //       debugPrint(tokenResult.toString());
+  //       debugPrint('User is not an admin');
+  //       // Lakukan sesuatu untuk pengguna biasa
+  //     }
+  //   }
+  // }
 }

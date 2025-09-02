@@ -81,7 +81,7 @@ class _PainResultPageState extends State<PainResultPage> {
                           if (snapshot.hasData) {
                             List<Map<String, dynamic>> item = snapshot.data!.docs.map((p) => p.data()).toList();
 
-                            debugPrint(item.length.toString());
+                            // debugPrint(item.length.toString());
 
                             if (item.isNotEmpty) {
                               return Column(

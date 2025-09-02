@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +20,83 @@ class PatientPage extends StatefulWidget {
   State<PatientPage> createState() => _PatientPageState();
 }
 
+// add BindingObserver to the page
+
 class _PatientPageState extends State<PatientPage> {
   User? user = FirebaseAuth.instance.currentUser;
+
+  List<QueryDocumentSnapshot> _allDocuments = [];
+  DocumentSnapshot? _lastDocument;
+  bool _hasMore = true;
+  final int _limit = 7;
+  late Stream<List<QueryDocumentSnapshot>> _patientStream;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _patientStream = _getInitialPatients();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void deactivate() {
+    _scrollController.removeListener(_scrollListener);
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Stream<List<QueryDocumentSnapshot>> _getInitialPatients() async* {
+    final initialQuery =
+        widget.isHistory
+            ? PatientController().patients.where('user_id', isEqualTo: user!.uid).limit(_limit)
+            : PatientController().patients.orderBy('created_at').limit(_limit);
+
+    final snap = await initialQuery.get();
+    _lastDocument = snap.docs.isNotEmpty ? snap.docs.last : null;
+    _allDocuments = snap.docs;
+    yield snap.docs;
+  }
+
+  Future<void> _loadMore() async {
+    if (!_hasMore || _lastDocument == null) return;
+
+    try {
+      final newQuery =
+          widget.isHistory
+              ? PatientController().patients.where('user_id', isEqualTo: user!.uid).startAfterDocument(_lastDocument!).limit(_limit)
+              : PatientController().patients.orderBy('created_at').startAfterDocument(_lastDocument!).limit(_limit);
+
+      final snap = await newQuery.get();
+      if (snap.docs.isEmpty) {
+        setState(() => _hasMore = false);
+        return;
+      }
+
+      debugPrint('Initial docs loaded: ${_allDocuments.length}');
+      debugPrint('Loading more from: ${_lastDocument?.id}');
+      debugPrint('New docs loaded: ${snap.docs.length}');
+
+      setState(() {
+        _lastDocument = snap.docs.last;
+        _allDocuments.addAll(snap.docs);
+      });
+    } catch (e) {
+      debugPrint('Load more error: $e');
+    }
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && _hasMore) {
+      _loadMore();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,42 +120,71 @@ class _PatientPageState extends State<PatientPage> {
             bottom: -2,
             child: CustomPaint(size: Size(context.width, context.height / 2.0), painter: RPSCustomPainter2()),
           ),
-          SizedBox(
-            height: context.height,
-            width: context.width,
-            child: StreamBuilder<QuerySnapshot>(
-              stream: widget.isHistory ? PatientController().patients.where('user_id', isEqualTo: user!.uid).snapshots() : PatientController().patients.orderBy('created_at').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      "Terjadi kesalahan, silahkan coba lagi",
-                      style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
-                    ),
+          RefreshIndicator(
+            onRefresh: () async {
+              setState(() {
+                _hasMore = true;
+                _lastDocument = null;
+                _allDocuments.clear();
+                _patientStream = _getInitialPatients();
+              });
+            },
+            child: SizedBox(
+              height: context.height,
+              width: context.width,
+              child: StreamBuilder<List<QueryDocumentSnapshot>>(
+                stream: _patientStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        "Terjadi kesalahan, silahkan coba lagi",
+                        style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) return Center(child: cLoading());
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Belum ada data pemeriksaan",
+                        style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }
+
+                  // Data available, display ListView
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                    physics: const BouncingScrollPhysics(),
+                    controller: _scrollController,
+                    itemCount: _allDocuments.length + (_hasMore && _allDocuments.length >= _limit ? 1 : 0), // <-- Perubahan disini
+                    itemBuilder: (context, index) {
+                      // Tampilkan loading hanya jika data mencapai limit
+                      if (_hasMore && _allDocuments.length >= _limit && index >= _allDocuments.length) {
+                        return Center(child: Padding(padding: const EdgeInsets.all(16.0), child: CircularProgressIndicator()));
+                      }
+
+                      // Pastikan index valid
+                      if (index < 0 || index >= _allDocuments.length) {
+                        return SizedBox.shrink();
+                      }
+
+                      // Tampilkan data pasien
+                      final patientData = _allDocuments[index].data() as Map<String, dynamic>;
+                      return patientCard(
+                        context,
+                        patient: Patient.fromMap({
+                          'user_id': patientData['user_id'] ?? '',
+                          'diagnostic': patientData['diagnostic'] ?? 'Kosong',
+                          ...patientData,
+                        }),
+                      );
+                    },
                   );
-                }
-
-                if (snapshot.connectionState == ConnectionState.waiting) return Center(child: cLoading());
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Text(
-                    "Belum ada data pemeriksaan",
-                    style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
-                  );
-                }
-
-                // Data tersedia, tampilkan ListView
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> patientData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
-                    patientData['user_id'] = patientData['user_id'] ?? '';
-                    patientData['diagnostic'] = patientData['diagnostic'] ?? 'Kosong';
-
-                    return patientCard(context, patient: Patient.fromMap(patientData));
-                  },
-                );
-              },
+                },
+              ),
             ),
           ),
         ],
@@ -89,140 +192,3 @@ class _PatientPageState extends State<PatientPage> {
     );
   }
 }
-
-// class CustomSearchDelegate extends SearchDelegate {
-//   static List getData = GetStorage().read('patients') ?? [];
-
-//   List<Patient> name = List.generate(
-//       getData.length, (index) => Patient.fromJson(getData[index]));
-
-//   Widget build(BuildContext context) {
-//     return const Scaffold();
-//   }
-
-//   @override
-//   ThemeData appBarTheme(BuildContext context) {
-//     return AppTheme()
-//         .themeData
-//         .copyWith(inputDecorationTheme: searchFieldDecorationTheme);
-//   }
-
-//   @override
-//   TextStyle? get searchFieldStyle => const TextStyle(
-//         color: Colors.white,
-//         fontSize: 20,
-//         decoration: TextDecoration.none,
-//       );
-
-//   @override
-//   InputDecorationTheme? get searchFieldDecorationTheme =>
-//       const InputDecorationTheme(
-//         labelStyle: TextStyle(
-//           color: Colors.white,
-//         ),
-//         helperStyle: TextStyle(color: Colors.white),
-//         hintStyle: TextStyle(
-//           color: Colors.white,
-//         ),
-//         border: InputBorder.none,
-//       );
-
-//   @override
-//   List<Widget>? buildActions(BuildContext context) {
-//     return [
-//       IconButton(
-//         onPressed: () {
-//           query = '';
-//           showSuggestions(context);
-//         },
-//         icon: const Icon(Icons.clear),
-//       ),
-//     ];
-//   }
-
-//   @override
-//   Widget? buildLeading(BuildContext context) {
-//     return IconButton(
-//       onPressed: () {
-//         close(context, null);
-//       },
-//       icon: const Icon(Icons.arrow_back_ios),
-//     );
-//   }
-
-//   @override
-//   Widget buildResults(BuildContext context) {
-//     List<Patient> macthQuery = [];
-//     for (var data in name) {
-//       if (data.name.toLowerCase().contains(query.toLowerCase()) ||
-//           data.name.toLowerCase().startsWith(query.toLowerCase()) ||
-//           data.id.toString().toLowerCase().startsWith(query.toLowerCase())) {
-//         macthQuery.add(data);
-//       }
-//     }
-//     return Container(
-//       height: context.height,
-//       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-//       child: macthQuery.isNotEmpty
-//           ? ListView.builder(
-//               itemCount: macthQuery.length,
-//               itemBuilder: (context, index) {
-//                 var result = macthQuery[index];
-//                 return patientCard(context, patient: result);
-//               },
-//             )
-//           : Column(
-//               children: [
-//                 textCard(context: context, title: "Data tidak ditemukan"),
-//               ],
-//             ),
-//     );
-//   }
-
-//   @override
-//   Widget buildSuggestions(BuildContext context) {
-//     List<Patient> macthQuery = [];
-//     for (var data in name) {
-//       if (data.name.toLowerCase().contains(query.toLowerCase()) ||
-//           data.name.toLowerCase().startsWith(query.toLowerCase()) ||
-//           data.id.toString().toLowerCase().startsWith(query.toLowerCase())) {
-//         macthQuery.add(data);
-//       }
-//     }
-//     return Container(
-//       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-//       child: ListView.builder(
-//         itemCount: macthQuery.length,
-//         itemBuilder: (context, index) {
-//           var result = macthQuery[index];
-//           return GestureDetector(
-//             onTap: () {
-//               log("$result");
-//               showResults(context);
-//               query = query.isNum
-//                   ? result.id.toString()
-//                   : query.isAlphabetOnly
-//                       ? result.name
-//                       : result.name;
-//             },
-//             child: Card(
-//               elevation: 1,
-//               child: Padding(
-//                 padding:
-//                     const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-//                 child: Text(
-//                   query.isNum
-//                       ? result.id.toString()
-//                       : query.isAlphabetOnly
-//                           ? result.name
-//                           : result.name,
-//                   style: const TextStyle(fontSize: 18),
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }

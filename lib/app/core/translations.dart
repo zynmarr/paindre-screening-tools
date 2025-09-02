@@ -122,6 +122,12 @@ Map texts = {
     'text.resultIsNot': 'The examination result is not ',
     'text.allResultExamination': 'The results of all your examinations are suffering from:',
     'text.lastResultxamination': 'Last Examination Result',
+
+    'text.goToPlayStore': 'Go to Play Store',
+
+    'text.requiredUpdate': 'Please update to the latest version to use this application...',
+    'text.maintenanceMode': 'The system is under maintenance. Please try again later.',
+    // 'text'
   },
   'id': {
     'text.welcomeInLogin': 'Selamat Datang,',
@@ -137,6 +143,11 @@ Map texts = {
     'text.resultIsNot': 'Hasil pemeriksaan bukan ',
     'text.allResultExamination': 'Hasil semua pemeriksaan anda menderita:',
     'text.lastResultxamination': 'Hasil Pemeriksaan Akhir',
+
+    'text.goToPlayStore': 'Kunjungi Play Store',
+
+    'text.requiredUpdate': 'Mohon update ke versi terbaru, untuk memakai aplikasi ini...',
+    'text.maintenanceMode': 'Sistem sedang dalam pemeliharaan. Silakan coba lagi nanti.',
   },
 };
 

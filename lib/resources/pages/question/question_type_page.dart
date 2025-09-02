@@ -29,7 +29,7 @@ class _QuestionTypePageState extends State<QuestionTypePage> {
                   ListTile(
                     onTap: () {
                       Utils.goToNextPage('question-page', arguments: {'questioName': questioName});
-                      debugPrint(questioName);
+                      // debugPrint(questioName);
                     },
                     leading: Icon(MdiIcons.chevronRight, size: 30),
                     title: Text(questioName, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),

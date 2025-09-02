@@ -1,11 +1,9 @@
-import 'dart:isolate';
-import 'dart:ui';
-
 import 'package:bot_toast/bot_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:screening_tools_android/app/utils/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RequestUpdatePage extends StatefulWidget {
   const RequestUpdatePage({super.key});
@@ -18,18 +16,6 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
   CollectionReference optionsApp = FirebaseFirestore.instance.collection('options_app');
 
   @override
-  void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-    super.dispose();
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, int status, int progress) {
-    final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
-    send!.send([id, status, progress]);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
@@ -37,7 +23,7 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             Utils.paindreShowLoading();
-            Utils.errorToast(message: "Terjadi kesalahan, silahkan coba lagi");
+            Utils.errorToast(message: 'error.message.unknown'.tr);
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -45,13 +31,7 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
           }
 
           if (snapshot.hasData) {
-            // var option = snapshot.data!.docs[0].data() as Map<String, dynamic>;
             BotToast.closeAllLoading();
-
-            // if (option['maintanance_mode'] == false) {
-            //   Future.delayed(Duration(seconds: 2))
-            //       .then((value) => Get.offAllNamed('home-page'));
-            // }
           }
 
           return Container(
@@ -67,20 +47,25 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
                 Container(
                   alignment: Alignment.center,
                   child: Text(
-                    'Mohon update ke versi terbaru, untuk memakai aplikasi ini...',
+                    'text.requiredUpdate'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: Colors.grey[700], fontWeight: FontWeight.bold),
                   ),
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 20), // Spasi antara tombol
                 SizedBox(
                   width: context.width / 1.8,
                   child: ElevatedButton(
                     onPressed: () async {
-                      setState(() {});
+                      Uri url = Uri.parse('https://play.google.com/store/apps/details?id=com.paindre_innovation.screening_tools_android'); // Ganti dengan URL aplikasi Anda
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
                     },
                     child: Text(
-                      'Refresh'.toUpperCase(),
+                      'text.goToPlayStore'.tr.toUpperCase(),
                       style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),

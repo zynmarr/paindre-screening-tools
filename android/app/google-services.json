@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1009083053499-kuabpdmo5rmkivdfibv8j4h82h7kj0sn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.paindre_innovation.screening_tools_android",
+            "certificate_hash": "edd3d4a7babe0dd0044b8377558aadc16daedf75"
+          }
+        },
+        {
           "client_id": "1009083053499-r2443i5r856ud2toh6imo9eb8gk000k0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -37,6 +45,14 @@
             {
               "client_id": "1009083053499-s49smndaistusrn9qto75qt0srepckve.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1009083053499-2vm3aljjhfq5pvac8l1b481jgdota7g6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.paindreinnovation.screeningToolsAndroid",
+                "app_store_id": "6751793557"
+              }
             }
           ]
         }

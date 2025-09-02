@@ -36,9 +36,6 @@ class _DetailPatientPageState extends State<DetailPatientPage> {
       setState(() {
         listScoringResult = value.docs.map((p) => p.data() as Map<String, dynamic>).toList();
       });
-      debugPrint("Patient ID: ${widget.patient.id}");
-      debugPrint("Patient: ${widget.patient.userID}");
-      debugPrint("User: ${user?.uid}");
     });
   }
 

@@ -180,8 +180,8 @@ class _CreatePatientPageState extends State<CreatePatientPage> {
                                     borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5, style: BorderStyle.solid),
                                   ),
                                 ),
-                              if (isDiagnosticActivated) const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                              if (isDiagnosticActivated)
+                              if (isDiagnosticActivated || serviceController.role == Roles.admin) const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              if (isDiagnosticActivated || serviceController.role == Roles.admin)
                                 cTextField(
                                   label: 'form.patient.diagnosis'.tr,
                                   controller: diagnostiController,
@@ -195,8 +195,8 @@ class _CreatePatientPageState extends State<CreatePatientPage> {
                                 ),
                               const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                               _buildGenderDropdown(),
-                              if (isPhoneActivated || isResponsiblePersonActivated) const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                              if (isPhoneActivated || isResponsiblePersonActivated)
+                              if (isResponsiblePersonActivated || serviceController.role == Roles.admin) const Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                              if (isResponsiblePersonActivated || serviceController.role == Roles.admin)
                                 cTextField(
                                   label: 'form.patient.examinerName'.tr,
                                   controller: examinerNameController,

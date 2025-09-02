@@ -65,8 +65,11 @@ class _QuestionPageState extends State<QuestionPage> {
           onSucces: () => Get.offAllNamed('home-page'),
           onCancel: () => Get.back(),
         );
+        if (didpop) {
+          Get.back(result: dialog);
+        }
 
-        return dialog;
+        // return dialog;
       },
       child: Scaffold(
         appBar: cAppBar(title: barTitle, centerTitle: true),
@@ -113,7 +116,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                       setState(() {
                                         questionSub['value'] = true;
                                         sbjScore += 1;
-                                        debugPrint(sbjScore.toString());
+                                        // debugPrint(sbjScore.toString());
                                       });
                                     }
                                   },
@@ -149,7 +152,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                           sbjScore -= 1;
                                         }
                                         questionSub['value'] = false;
-                                        debugPrint(sbjScore.toString());
+                                        // debugPrint(sbjScore.toString());
                                       });
                                     }
                                   },
@@ -222,7 +225,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                       setState(() {
                                         questionSub['value'] = true;
                                         peScore += 1;
-                                        debugPrint(peScore.toString());
+                                        // debugPrint(peScore.toString());
                                       });
                                     }
                                   },
@@ -258,7 +261,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                           peScore -= 1;
                                         }
                                         questionSub['value'] = false;
-                                        debugPrint(peScore.toString());
+                                        // debugPrint(peScore.toString());
                                       });
                                     }
                                   },

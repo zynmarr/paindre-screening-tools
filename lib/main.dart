@@ -67,7 +67,7 @@ class InitLanguageCode {
     } else {
       // If stored, update the locale with the stored language code
       String languageCode = getStoredLanguageCode();
-      debugPrint("Stored language code: $languageCode");
+      // debugPrint("Stored language code: $languageCode");
       Get.updateLocale(Locale(languageCode));
     }
   }
@@ -85,7 +85,7 @@ class InitLanguageCode {
   // set the language code in GetStorage
   static Future<void> setLanguageCode(String languageCode) async {
     await GetStorage().write('language_code', languageCode);
-    debugPrint("Language code set to: $languageCode");
+    // debugPrint("Language code set to: $languageCode");
     Get.updateLocale(Locale(languageCode));
   }
 
@@ -109,7 +109,7 @@ class InitLanguageCode {
 //   Widget build(BuildContext context) {
 //     Locale? locale = Get.deviceLocale; // Automatically gets the device locale
 //     Get.updateLocale(locale!); // Update the locale in GetX
-//     debugPrint("Current locale: ${Get.locale}");
+    // debugPrint("Current locale: ${Get.locale}");
 //     return GetMaterialApp(
 //       title: 'Paindre Screening Tools',
 //       locale: locale,
