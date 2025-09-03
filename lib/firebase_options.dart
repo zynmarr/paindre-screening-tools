@@ -38,13 +38,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAw44ddOCWnLzAm3_5muvwuiMuXUDtE-Lk',
-    appId: '1:1009083053499:ios:c26018e92a1ca2f0a3c09e',
+    appId: '1:1009083053499:ios:9ab1436c1d046643a3c09e',
     messagingSenderId: '1009083053499',
     projectId: 'paindre-screening-tools-d014e',
     storageBucket: 'paindre-screening-tools-d014e.firebasestorage.app',
     androidClientId: '1009083053499-kuabpdmo5rmkivdfibv8j4h82h7kj0sn.apps.googleusercontent.com',
-    iosClientId: '1009083053499-2vm3aljjhfq5pvac8l1b481jgdota7g6.apps.googleusercontent.com',
-    iosBundleId: 'com.paindreinnovation.screeningToolsAndroid',
+    iosClientId: '1009083053499-ipk8fq7e64aaukjtj7vm2jhc6u6denpn.apps.googleusercontent.com',
+    iosBundleId: 'com.paindreinnovation.screeningTools',
   );
 
 }
