@@ -2,20 +2,21 @@ import Flutter
 import UIKit
 import flutter_local_notifications
 import Firebase
+import FirebaseCore
+import FirebaseAppCheck
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
-  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    let providerFactory = AppCheckDebugProviderFactory()
-    AppCheck.setAppCheckProviderFactory(providerFactory)
-    return true
-  }
-  
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    FirebaseApp.configure()
 
+
+
+    // let providerFactory = AppCheckDebugProviderFactory()
+    // AppCheck.setAppCheckProviderFactory(providerFactory)
     
 
     FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
