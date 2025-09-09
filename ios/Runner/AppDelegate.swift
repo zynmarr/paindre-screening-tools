@@ -3,7 +3,6 @@ import UIKit
 import flutter_local_notifications
 import Firebase
 import FirebaseCore
-import FirebaseAppCheck
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
