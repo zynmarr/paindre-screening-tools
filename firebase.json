@@ -1,14 +1,1 @@
-{
-    "flutter": {
-        "platforms": {
-            "dart": {
-                "lib/firebase_options.dart": {
-                    "projectId": "paindre-screening-tools-d014e",
-                    "configurations": {
-                        "ios": "1:1009083053499:ios:9ab1436c1d046643a3c09e"
-                    }
-                }
-            }
-        }
-    }
-}
+{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"paindre-screening-tools-d014e","configurations":{"android":"1:1009083053499:android:ff5e8f39324acb7da3c09e","ios":"1:1009083053499:ios:9ab1436c1d046643a3c09e"}}},"android":{"default":{"projectId":"paindre-screening-tools-d014e","appId":"1:1009083053499:android:ff5e8f39324acb7da3c09e","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"paindre-screening-tools-d014e","appId":"1:1009083053499:ios:9ab1436c1d046643a3c09e","uploadDebugSymbols":true,"fileOutput":"ios/Runner/GoogleService-Info.plist"}}}}}

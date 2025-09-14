@@ -61,7 +61,10 @@ class NotificationService {
 
       final AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+      final DarwinInitializationSettings initializationSettingsIOS =
+          DarwinInitializationSettings(requestAlertPermission: true, requestBadgePermission: true, requestSoundPermission: true);
+
+      final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
       await _localNotifications.initialize(
         initializationSettings,

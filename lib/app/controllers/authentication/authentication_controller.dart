@@ -6,20 +6,38 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
-  final CollectionReference feature = FirebaseFirestore.instance.collection('features');
+  final CollectionReference userCollection = FirebaseFirestore.instance
+      .collection('users');
+  final CollectionReference feature = FirebaseFirestore.instance.collection(
+    'features',
+  );
+
+  final GoogleSignIn googleSignIn = GoogleSignIn(
+    // Optionally specify scopes if needed
+    scopes: ['email', 'https://www.googleapis.com/auth/contacts.readonly'],
+    // You can specify signInOption if needed; default is standard
+    signInOption: SignInOption.standard,
+    serverClientId:
+        '1009083053499-s49smndaistusrn9qto75qt0srepckve.apps.googleusercontent.com',
+  );
 
   /// 🔹 Fungsi Login via Google
   Future<User?> loginWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser =
-          await GoogleSignIn(signInOption: SignInOption.standard, clientId: '1009083053499-s49smndaistusrn9qto75qt0srepckve.apps.googleusercontent.com', serverClientId: '1009083053499-s49smndaistusrn9qto75qt0srepckve.apps.googleusercontent.com').signIn();
+          await googleSignIn.signIn();
       if (googleUser == null) return null; // Jika user batal login
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final OAuthCredential credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
       final User? user = userCredential.user;
 
       if (user != null) {
@@ -31,10 +49,17 @@ class AuthController {
     }
   }
 
-  Future<User?> loginWithEmailAndPassword({required String email, required String password}) async {
+  Future<User?> loginWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
     try {
-      Map<String, dynamic> data = await feature.doc('authentication').get().then((value) => value.data() as Map<String, dynamic>);
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      Map<String, dynamic> data = await feature
+          .doc('authentication')
+          .get()
+          .then((value) => value.data() as Map<String, dynamic>);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       final User? user = userCredential.user;
 
       // Memeriksa apakah user null
@@ -62,14 +87,21 @@ class AuthController {
       } else if (error.code == 'invalid-credential') {
         return Future.error('error.message.invalidCredential'.tr);
       } else {
-        return Future.error('error.message.login'.tr + error.message.toString());
+        return Future.error(
+          'error.message.login'.tr + error.message.toString(),
+        );
       }
     }
   }
 
-  Future<User?> registerWithEmailAndPassword({required String email, required String password, required String name}) async {
+  Future<User?> registerWithEmailAndPassword({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       await userCredential.user?.updateDisplayName(name);
       User? user = userCredential.user;
       await user?.sendEmailVerification();
@@ -82,7 +114,9 @@ class AuthController {
       if (error.code == 'email-already-in-use') {
         return Future.error('error.message.emailAlreadyInUse'.tr);
       } else {
-        return Future.error('error.message.register'.tr + error.message.toString());
+        return Future.error(
+          'error.message.register'.tr + error.message.toString(),
+        );
       }
     }
   }
@@ -103,7 +137,6 @@ class AuthController {
   //         'role': 'user', // Default role
   //       });
   //     } else {
-        
 
   //     }
 

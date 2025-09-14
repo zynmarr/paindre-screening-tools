@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:screening_tools_android/app/controllers/patient/patient.dart';
 import 'package:screening_tools_android/app/controllers/service/service_controller.dart';
@@ -96,6 +97,11 @@ class _CreatePatientPageState extends State<CreatePatientPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       // backgroundColor: Colors.grey[300],
+      appBar: cAppBar(
+        title: 'button.startScreening'.tr,
+        centerTitle: true,
+        leading: GestureDetector(onTap: () => Get.back(), child: Icon(MdiIcons.chevronLeft, size: 20)),
+      ),
       body: SizedBox(
         height: context.height,
         child: Stack(
