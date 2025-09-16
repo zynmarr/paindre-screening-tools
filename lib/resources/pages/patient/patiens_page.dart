@@ -149,7 +149,7 @@ class _PatientPageState extends State<PatientPage> {
                     return Center(
                       child: Text(
                         "Belum ada data pemeriksaan",
-                        style: context.textTheme.bodyLarge!.copyWith(color: Colors.blue[900], fontWeight: FontWeight.bold),
+                        style: context.textTheme.bodyLarge!.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                     );
                   }

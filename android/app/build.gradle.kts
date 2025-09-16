@@ -41,6 +41,7 @@ android {
         targetSdk = 35
         versionCode = 10
         versionName = "1.5.1"
+        manifestPlaceholders["appAuthRedirectScheme"] = "apple-auth-scheme"
     }
 
     signingConfigs {

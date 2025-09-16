@@ -73,6 +73,8 @@ class _LoginPageState extends State<LoginPage> {
                           _buildLoginButton(context),
                           const SizedBox(height: 10),
                           _buildGoogleLoginButton(),
+                          const SizedBox(height: 10),
+                          _buildAppleLoginButton(),
                         ],
                       ),
                     ),
@@ -197,8 +199,31 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         icon: Icon(MdiIcons.google, color: Colors.white),
-        label:  Text('text.loginWithGoogle'.tr, style: TextStyle(color: Colors.white)),
+        label: Text('text.loginWithGoogle'.tr, style: TextStyle(color: Colors.white)),
         style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+      ),
+    );
+  }
+
+  SizedBox _buildAppleLoginButton() {
+    return SizedBox(
+      width: context.width / 2,
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          Utils.paindreShowLoading();
+          try {
+            await _authController.loginWithApple();
+            Get.offNamed(Routes.home);
+            Utils.successToast(message: 'success.message.login'.tr);
+          } catch (e) {
+            Utils.errorToast(message: "${'error.message.loginWithGoogle'.tr}${e.toString()}");
+          } finally {
+            BotToast.closeAllLoading();
+          }
+        },
+        icon: Icon(MdiIcons.apple, color: Colors.white),
+        label: Text('Login With Apple', style: TextStyle(color: Colors.white)),
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
       ),
     );
   }
