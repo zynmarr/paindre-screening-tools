@@ -1,0 +1,22 @@
+workflows:
+  ios-release-build:
+    name: iOS Release Build
+    instance_type: mac_mini_m1
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Get Flutter packages
+        script: flutter packages pub get
+      - name: Build IPA
+        script: flutter build ipa --release
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      # CodeMagic akan menangani code signing secara otomatis
+      # karena Anda sudah mengunggah kredensial di UI.
+      # Anda bisa menambahkan langkah distribusi ke App Store Connect di sini.
+      app_store_connect:
+        auth:
+          api_key: $APP_STORE_CONNECT_API_KEY
