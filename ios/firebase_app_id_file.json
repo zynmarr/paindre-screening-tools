@@ -1,4 +1,7 @@
 {
-  "app_id": "1:1009083053499:ios:9ab1436c1d046643a3c09e"
+  "file_generated_by": "FlutterFire CLI",
+  "purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory",
+  "GOOGLE_APP_ID": "1:1009083053499:ios:9ab1436c1d046643a3c09e",
+  "FIREBASE_PROJECT_ID": "paindre-screening-tools-d014e",
+  "GCM_SENDER_ID": "1009083053499"
 }
-
