@@ -34,7 +34,6 @@ target 'Runner' do
   use_frameworks!
 
   pod 'GoogleSignIn','~> 8.0'
-      :git => 'https://github.com/google/GoogleSignIn-iOS.git'
   pod 'GoogleSignInSwiftSupport'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
