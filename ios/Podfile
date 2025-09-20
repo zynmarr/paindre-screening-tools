@@ -10,6 +10,9 @@ project 'Runner', {
   'Release' => :release,
 }
 
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/firebase/SpecsDev.git'
+
 def flutter_root
   generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
   unless File.exist?(generated_xcode_build_settings_path)
@@ -29,6 +32,10 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   use_frameworks!
+
+  pod 'GoogleSignIn','~> 8.0'
+      :git => 'https://github.com/google/GoogleSignIn-iOS.git'
+  pod 'GoogleSignInSwiftSupport'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
