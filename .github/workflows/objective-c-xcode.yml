@@ -52,7 +52,7 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
           
           # Run the flutterfire configure command. Replace YOUR_PROJECT_ID with your actual Firebase project ID.
-          flutterfire configure --project=paindre-screening-tools-d014e -y
+          flutterfire configure --project=paindre-screening-tools-d014e --platforms=ios -y
 
       - name: Find Xcode project or workspace
         id: find_project
