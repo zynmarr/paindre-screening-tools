@@ -32,6 +32,10 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      # Langkah baru untuk mengaktifkan FlutterFire CLI agar perintah `flutterfire` dapat ditemukan.
+      - name: Activate FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+
       # - name: Run build_runner for code generation
       #   run: flutter packages pub run build_runner build
 
