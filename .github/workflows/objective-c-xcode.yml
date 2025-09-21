@@ -40,6 +40,12 @@ jobs:
 
       # - name: Run build_runner for code generation
       #   run: flutter packages pub run build_runner build
+      
+      # Langkah baru untuk memastikan semua dependensi iOS diinstal sebelum build.
+      - name: Install iOS dependencies with CocoaPods
+        run: |
+          cd ios
+          pod install
 
       # Langkah ini mengonfigurasi proyek Flutter dengan Firebase menggunakan kunci akun layanan.
       # Pastikan Anda telah menyimpan kunci ini sebagai rahasia (secret) di GitHub.
