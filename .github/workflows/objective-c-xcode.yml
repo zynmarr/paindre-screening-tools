@@ -31,6 +31,15 @@ jobs:
         with:
           channel: 'stable' # or 'beta', 'dev'
 
+      # Langkah ini adalah optimasi terbesar. Ini akan melakukan cache paket-paket Dart dan Flutter.
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: ${{ runner.os }}-flutter-pub-cache-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-pub-cache-
+
       - name: Get Flutter dependencies
         run: flutter pub get
 
@@ -60,6 +69,7 @@ jobs:
       - name: Install iOS dependencies with CocoaPods
         run: |
           cd ios
+          sudo gem update --system
           sudo gem install cocoapods
           pod install
 
