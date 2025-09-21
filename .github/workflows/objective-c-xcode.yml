@@ -8,25 +8,62 @@ on:
 
 jobs:
   build:
-    name: Build and analyse default scheme using xcodebuild command
+    name: Build and analyze default scheme
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set Default Scheme
+
+      - name: Install Flutter and dependencies
+        # Assuming you're using Flutter for a mobile app.
+        # This step is crucial for the build to succeed if your project uses Flutter.
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable' # or 'beta', 'dev'
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Run build_runner for code generation
+        run: flutter packages pub run build_runner build
+
+      - name: Find Xcode project or workspace
+        id: find_project
         run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          flutter pub get
-          flutter packages pub run build_runner build
-          echo Using default scheme: $default
-      - name: Build
-        env:
-          scheme: ${{ 'default' }}
+          if [ -d "./ios" ]; then
+            cd ./ios
+          fi
+          
+          if [ -d *.xcworkspace ]; then
+            echo "project_path=$(pwd)" >> $GITHUB_OUTPUT
+            echo "file_type=workspace" >> $GITHUB_OUTPUT
+            echo "file_to_build=$(basename *.xcworkspace)" >> $GITHUB_OUTPUT
+          elif [ -d *.xcodeproj ]; then
+            echo "project_path=$(pwd)" >> $GITHUB_OUTPUT
+            echo "file_type=project" >> $GITHUB_OUTPUT
+            echo "file_to_build=$(basename *.xcodeproj)" >> $GITHUB_OUTPUT
+          else
+            echo "No .xcworkspace or .xcodeproj found!"
+            exit 1
+          fi
+
+      - name: Get default scheme
+        id: get_scheme
         run: |
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" | xcpretty && exit ${PIPESTATUS[0]}
+          cd ${{ steps.find_project.outputs.project_path }}
+          
+          # Using xcodebuild to find the default scheme for the project
+          scheme=$(xcodebuild -list -json | ruby -e "require 'json'; data = JSON.parse(STDIN.read); puts data['project']['targets'][0]['name']")
+          echo "scheme=$scheme" >> $GITHUB_OUTPUT
+          echo "Using default scheme: $scheme"
+
+      - name: Clean, Build, and Analyze
+        run: |
+          cd ${{ steps.find_project.outputs.project_path }}
+          
+          # Use the determined file and scheme to run xcodebuild
+          xcodebuild clean build analyze \
+            -scheme "${{ steps.get_scheme.outputs.scheme }}" \
+            -"${{ steps.find_project.outputs.file_type }}" "${{ steps.find_project.outputs.file_to_build }}" \
+            | xcpretty && exit ${PIPESTATUS[0]}
