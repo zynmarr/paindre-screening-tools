@@ -32,8 +32,8 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Run build_runner for code generation
-        run: flutter packages pub run build_runner build
+      # - name: Run build_runner for code generation
+      #   run: flutter packages pub run build_runner build
 
       # Langkah ini mengonfigurasi proyek Flutter dengan Firebase menggunakan kunci akun layanan.
       # Pastikan Anda telah menyimpan kunci ini sebagai rahasia (secret) di GitHub.
@@ -48,7 +48,7 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
           
           # Run the flutterfire configure command. Replace YOUR_PROJECT_ID with your actual Firebase project ID.
-          flutterfire configure --project=paindre-screening-tools-d014e
+          flutterfire configure --project=paindre-screening-tools-d014e -y
 
       - name: Find Xcode project or workspace
         id: find_project
