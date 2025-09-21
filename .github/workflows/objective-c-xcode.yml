@@ -13,11 +13,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
       # Langkah ini menyiapkan lingkungan Node.js, yang diperlukan untuk menginstal Firebase CLI.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          
       # Langkah ini menginstal Firebase CLI secara global.
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
@@ -79,11 +81,24 @@ jobs:
         run: |
           cd ${{ steps.find_project.outputs.project_path }}
           
-          # Using xcodebuild to find the default scheme for the project
-          scheme=$(xcodebuild -list -json | ruby -e "require 'json'; data = JSON.parse(STDIN.read); puts data['project']['targets'][0]['name']")
+          # Use xcodebuild to get a list of schemes and select the first one found.
+          scheme_list=$(xcodebuild -list -json | tr -d '\n')
+          
+          # Use Ruby to parse the JSON and get the first scheme name from the correct section.
+          if [[ "${{ steps.find_project.outputs.file_type }}" == "workspace" ]]; then
+            scheme=$(echo "$scheme_list" | ruby -e "require 'json'; data = JSON.parse(STDIN.read); puts data['workspace']['schemes'][0]")
+          else
+            scheme=$(echo "$scheme_list" | ruby -e "require 'json'; data = JSON.parse(STDIN.read); puts data['project']['schemes'][0]")
+          fi
+
+          if [[ -z "$scheme" ]]; then
+            echo "Error: Could not determine the Xcode scheme. Please ensure your project has a shared scheme."
+            exit 1
+          fi
+
           echo "scheme=$scheme" >> $GITHUB_OUTPUT
           echo "Using default scheme: $scheme"
-
+          
       - name: Clean, Build, and Analyze
         run: |
           cd ${{ steps.find_project.outputs.project_path }}
