@@ -1,5 +1,4 @@
 name: Xcode - Build and Analyze
-
 on:
   push:
     branches: [ "main" ]
@@ -14,6 +13,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      # Langkah ini menyiapkan lingkungan Node.js, yang diperlukan untuk menginstal Firebase CLI.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # Langkah ini menginstal Firebase CLI secara global.
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
       - name: Install Flutter and dependencies
         # Assuming you're using Flutter for a mobile app.
@@ -27,6 +34,21 @@ jobs:
 
       - name: Run build_runner for code generation
         run: flutter packages pub run build_runner build
+
+      # Langkah ini mengonfigurasi proyek Flutter dengan Firebase menggunakan kunci akun layanan.
+      # Pastikan Anda telah menyimpan kunci ini sebagai rahasia (secret) di GitHub.
+      - name: Configure FlutterFire
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          # Create a file for the service account key from the GitHub Secret.
+          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > firebase-service-account.json
+          
+          # Set the environment variable to use the key for authentication.
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
+          
+          # Run the flutterfire configure command. Replace YOUR_PROJECT_ID with your actual Firebase project ID.
+          flutterfire configure --project=paindre-screening-tools-d014e
 
       - name: Find Xcode project or workspace
         id: find_project
