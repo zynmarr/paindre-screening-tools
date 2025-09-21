@@ -84,12 +84,21 @@ jobs:
           # Use xcodebuild to get a list of schemes and select the first one found.
           scheme_list=$(xcodebuild -list -json | tr -d '\n')
           
-          # Use Ruby to parse the JSON and get the first scheme name from the correct section.
-          if [[ "${{ steps.find_project.outputs.file_type }}" == "workspace" ]]; then
-            scheme=$(echo "$scheme_list" | ruby -e "require 'json'; data = JSON.parse(STDIN.read); puts data['workspace']['schemes'][0]")
-          else
-            scheme=$(echo "$scheme_list" | ruby -e "require 'json'; data = JSON.parse(STDIN.read); puts data['project']['schemes'][0]")
-          fi
+          # Use a more robust Ruby script to safely find the first available scheme.
+          scheme=$(echo "$scheme_list" | ruby -e "
+            require 'json'
+            data = JSON.parse(STDIN.read)
+            schemes = nil
+            if data['workspace'] && data['workspace']['schemes']
+              schemes = data['workspace']['schemes']
+            elsif data['project'] && data['project']['schemes']
+              schemes = data['project']['schemes']
+            end
+            
+            if schemes && schemes[0]
+              puts schemes[0]
+            end
+          ")
 
           if [[ -z "$scheme" ]]; then
             echo "Error: Could not determine the Xcode scheme. Please ensure your project has a shared scheme."
@@ -98,7 +107,7 @@ jobs:
 
           echo "scheme=$scheme" >> $GITHUB_OUTPUT
           echo "Using default scheme: $scheme"
-          
+
       - name: Clean, Build, and Analyze
         run: |
           cd ${{ steps.find_project.outputs.project_path }}
