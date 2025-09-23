@@ -1,0 +1,169 @@
+-------------------------------------
+Translated Report (Full Report Below)
+-------------------------------------
+
+Incident Identifier: 7B3F39F1-D11F-47DB-BB40-DE595DBA728B
+Beta Identifier:     408D7009-161F-517F-85E3-C4525ED2988E
+Hardware Model:      VirtualMac2,1
+Process:             Paindre Screening Tools [98405]
+Path:                /Users/USER/Library/Developer/CoreSimulator/Devices/85CDBD01-D672-4643-BC68-87A2B69E181A/data/Containers/Bundle/Application/7D26D925-C162-4948-A337-EB97CC6D2B8B/Paindre Screening Tools.app/Paindre Screening Tools
+Identifier:          com.paindreinnovation.screeningTools
+Version:             1.2.2 (9)
+Beta:                YES
+Code Type:           ARM-64 (Native)
+Role:                Foreground
+Parent Process:      launchd_sim [93981]
+Coalition:           com.apple.CoreSimulator.SimDevice.85CDBD01-D672-4643-BC68-87A2B69E181A [959]
+Responsible Process: SimulatorTrampoline [1630]
+
+Date/Time:           2025-09-23 09:34:33.1992 +0000
+Launch Time:         2025-09-23 09:34:33.0584 +0000
+OS Version:          macOS 15.5 (24F74)
+Release Type:        User
+Report Version:      104
+
+Exception Type:  EXC_CRASH (SIGKILL (Code Signature Invalid))
+Exception Codes: 0x0000000000000000, 0x0000000000000000
+Termination Reason: EXEC 14 Binary with wrong platform
+
+Triggered by Thread:  0
+
+Thread 0 Crashed:
+0   dyld_path_missing             	       0x1005707c0 _dyld_start + 0
+
+
+Thread 0 crashed with ARM Thread State (64-bit):
+    x0: 0x0000000000000000   x1: 0x0000000000000000   x2: 0x0000000000000000   x3: 0x0000000000000000
+    x4: 0x0000000000000000   x5: 0x0000000000000000   x6: 0x0000000000000000   x7: 0x0000000000000000
+    x8: 0x0000000000000000   x9: 0x0000000000000000  x10: 0x0000000000000000  x11: 0x0000000000000000
+   x12: 0x0000000000000000  x13: 0x0000000000000000  x14: 0x0000000000000000  x15: 0x0000000000000000
+   x16: 0x0000000000000000  x17: 0x0000000000000000  x18: 0x0000000000000000  x19: 0x0000000000000000
+   x20: 0x0000000000000000  x21: 0x0000000000000000  x22: 0x0000000000000000  x23: 0x0000000000000000
+   x24: 0x0000000000000000  x25: 0x0000000000000000  x26: 0x0000000000000000  x27: 0x0000000000000000
+   x28: 0x0000000000000000   fp: 0x0000000000000000   lr: 0x0000000000000000
+    sp: 0x000000016fcaa588   pc: 0x00000001005707c0 cpsr: 0x00001000
+   far: 0x0000000000000000  esr: 0x00000000  Address size fault
+
+Binary Images:
+       0x10056c000 -        0x100607fff dyld_path_missing (*) <9cf0401a-a938-389e-a77d-9e9608076ccf> /dyld_path_missing
+       0x100154000 -        0x1001affff main_executable_path_missing (*) <35fc4785-7fc2-3e2e-8530-e3da1e2ca708> /main_executable_path_missing
+               0x0 - 0xffffffffffffffff ??? (*) <00000000-0000-0000-0000-000000000000> ???
+
+Error Formulating Crash Report:
+dyld_process_snapshot_get_shared_cache failed
+
+EOF
+
+-----------
+Full Report
+-----------
+
+{"incident_id":"7B3F39F1-D11F-47DB-BB40-DE595DBA728B","app_name":"Paindre Screening Tools","timestamp":"2025-09-23 09:34:33.00 +0000","app_version":"1.2.2","slice_uuid":"35fc4785-7fc2-3e2e-8530-e3da1e2ca708","build_version":"9","platform":0,"bundleID":"com.paindreinnovation.screeningTools","share_with_app_devs":0,"is_first_party":0,"bug_type":"309","os_version":"macOS 15.5 (24F74)","roots_installed":0,"name":"Paindre Screening Tools","is_beta":1}
+{
+  "uptime" : 1500,
+  "procRole" : "Foreground",
+  "version" : 2,
+  "userID" : 501,
+  "deployVersion" : 210,
+  "modelCode" : "VirtualMac2,1",
+  "coalitionID" : 959,
+  "osVersion" : {
+    "train" : "macOS 15.5",
+    "build" : "24F74",
+    "releaseType" : "User"
+  },
+  "captureTime" : "2025-09-23 09:34:33.1992 +0000",
+  "codeSigningMonitor" : 0,
+  "incident" : "7B3F39F1-D11F-47DB-BB40-DE595DBA728B",
+  "pid" : 98405,
+  "translated" : false,
+  "cpuType" : "ARM-64",
+  "roots_installed" : 0,
+  "bug_type" : "309",
+  "procLaunch" : "2025-09-23 09:34:33.0584 +0000",
+  "procStartAbsTime" : 37083820922,
+  "procExitAbsTime" : 37087104448,
+  "procName" : "Paindre Screening Tools",
+  "procPath" : "\/Users\/USER\/Library\/Developer\/CoreSimulator\/Devices\/85CDBD01-D672-4643-BC68-87A2B69E181A\/data\/Containers\/Bundle\/Application\/7D26D925-C162-4948-A337-EB97CC6D2B8B\/Paindre Screening Tools.app\/Paindre Screening Tools",
+  "bundleInfo" : {"CFBundleShortVersionString":"1.2.2","CFBundleVersion":"9","CFBundleIdentifier":"com.paindreinnovation.screeningTools"},
+  "storeInfo" : {"entitledBeta":true,"deviceIdentifierForVendor":"408D7009-161F-517F-85E3-C4525ED2988E","thirdParty":true},
+  "parentProc" : "launchd_sim",
+  "parentPid" : 93981,
+  "coalitionName" : "com.apple.CoreSimulator.SimDevice.85CDBD01-D672-4643-BC68-87A2B69E181A",
+  "isBeta" : 1,
+  "appleIntelligenceStatus" : {"reasons":["deviceNotCapable","countryLocationIneligible","selectedSiriLanguageIneligible","countryBillingIneligible"],"state":"unavailable"},
+  "responsiblePid" : 1630,
+  "responsibleProc" : "SimulatorTrampoline",
+  "codeSigningID" : "",
+  "codeSigningTeamID" : "",
+  "codeSigningFlags" : 16777216,
+  "codeSigningValidationCategory" : 0,
+  "codeSigningTrustLevel" : 4294967295,
+  "codeSigningAuxiliaryInfo" : 0,
+  "instructionByteStream" : {"beforePC":"4AMVqrw6AZTgAwD5gQQAsCHEAJHgAxSqdH8BlCgAgFJoAgA58f\/\/Fw==","atPC":"4AMAkR\/sfJIdAIDSHgCA0gMDABQfAACRYAAf1n8jA9X0T76p\/XsBqQ=="},
+  "bootSessionUUID" : "3266C066-33E2-4990-AE7F-1D26C8533873",
+  "sip" : "disabled",
+  "exception" : {"codes":"0x0000000000000000, 0x0000000000000000","rawCodes":[0,0],"type":"EXC_CRASH","signal":"SIGKILL (Code Signature Invalid)"},
+  "termination" : {"flags":0,"code":14,"namespace":"EXEC","indicator":"Binary with wrong platform"},
+  "extMods" : {"caller":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"system":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"targeted":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"warnings":0},
+  "faultingThread" : 0,
+  "threads" : [{"triggered":true,"id":143458,"threadState":{"x":[{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":4096},"fp":{"value":0},"sp":{"value":6170518920},"esr":{"value":0,"description":" Address size fault"},"pc":{"value":4300670912,"matchesCrashFrame":1},"far":{"value":0}},"frames":[{"imageOffset":18368,"symbol":"_dyld_start","symbolLocation":0,"imageIndex":0}]}],
+  "usedImages" : [
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 4300652544,
+    "size" : 638976,
+    "uuid" : "9cf0401a-a938-389e-a77d-9e9608076ccf",
+    "path" : "\/dyld_path_missing",
+    "name" : "dyld_path_missing"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4296359936,
+    "size" : 376832,
+    "uuid" : "35fc4785-7fc2-3e2e-8530-e3da1e2ca708",
+    "path" : "\/main_executable_path_missing",
+    "name" : "main_executable_path_missing"
+  },
+  {
+    "size" : 0,
+    "source" : "A",
+    "base" : 0,
+    "uuid" : "00000000-0000-0000-0000-000000000000"
+  }
+],
+  "vmSummary" : "ReadOnly portion of Libraries: Total=1440K resident=0K(0%) swapped_out_or_unallocated=1440K(100%)\nWritable regions: Total=8240K written=64K(1%) resident=64K(1%) swapped_out=0K(0%) unallocated=8176K(99%)\n\n                                VIRTUAL   REGION \nREGION TYPE                        SIZE    COUNT (non-coalesced) \n===========                     =======  ======= \nSTACK GUARD                       56.0M        1 \nStack                             8176K        1 \nVM_ALLOCATE                         16K        1 \n__DATA                             112K        2 \n__DATA_CONST                        64K        2 \n__DATA_DIRTY                        16K        1 \n__LINKEDIT                         448K        2 \n__TEXT                             992K        2 \n__TPRO_CONST                       144K        1 \nmapped file                        4.6G       13 \npage table in kernel                64K        1 \n===========                     =======  ======= \nTOTAL                              4.6G       27 \n",
+  "legacyInfo" : {
+  "threadTriggered" : {
+
+  }
+},
+  "logWritingSignature" : "ba19c4804878348e43d6f5bfd4145a87436918a7",
+  "trialInfo" : {
+  "rollouts" : [
+    {
+      "rolloutId" : "6410af69ed1e1e7ab93ed169",
+      "factorPackIds" : {
+
+      },
+      "deploymentId" : 240000011
+    },
+    {
+      "rolloutId" : "66d35d7fe4d6bf7664f40ddf",
+      "factorPackIds" : {
+        "BLACKPEARL_SPARROW" : "67c7824a1baae429bb41b897"
+      },
+      "deploymentId" : 240000031
+    }
+  ],
+  "experiments" : [
+
+  ]
+},
+  "reportNotes" : [
+  "dyld_process_snapshot_get_shared_cache failed"
+]
+}
+
