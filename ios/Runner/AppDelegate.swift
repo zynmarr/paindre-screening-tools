@@ -14,7 +14,7 @@ import flutter_local_notifications
     GeneratedPluginRegistrant.register(with: self)
     
     // 2. Setelah plugin terdaftar, baru konfigurasikan Firebase.
-    FirebaseApp.configure()
+    //FirebaseApp.configure()
     
     // Konfigurasi untuk notifikasi
     if #available(iOS 10.0, *) {
