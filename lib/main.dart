@@ -11,15 +11,20 @@ import 'package:screening_tools_android/app/controllers/service/service_controll
 import 'package:screening_tools_android/app/core/core.dart';
 import 'package:screening_tools_android/app/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseAppCheck.instance.activate(
+    appleProvider: AppleProvider.appAttest,
+    androidProvider: AndroidProvider.playIntegrity,
+  );
   await NotificationService.instance.init();
   await InitLanguageCode.init();
-  
+
   // Initialize Firebase Crashlytics
   FlutterError.onError = (errorDetails) {
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);

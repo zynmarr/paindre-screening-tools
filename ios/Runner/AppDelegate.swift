@@ -9,12 +9,7 @@ import flutter_local_notifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    
-    // 1. Daftarkan semua plugin Flutter terlebih dahulu. Ini sangat penting.
     GeneratedPluginRegistrant.register(with: self)
-    
-    // 2. Setelah plugin terdaftar, baru konfigurasikan Firebase.
-    //FirebaseApp.configure()
     
     // Konfigurasi untuk notifikasi
     if #available(iOS 10.0, *) {
