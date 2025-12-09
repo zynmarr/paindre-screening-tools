@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:screening_tools_android/app/controllers/question/question.dart';
+import 'package:screening_tools_android/app/controllers/question/question_controller.dart';
 import 'package:screening_tools_android/app/utils/utils.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
 
@@ -29,7 +29,6 @@ class _QuestionTypePageState extends State<QuestionTypePage> {
                   ListTile(
                     onTap: () {
                       Utils.goToNextPage('question-page', arguments: {'questioName': questioName});
-                      // debugPrint(questioName);
                     },
                     leading: Icon(MdiIcons.chevronRight, size: 30),
                     title: Text(questioName, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),

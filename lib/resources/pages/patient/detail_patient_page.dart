@@ -87,7 +87,11 @@ class _DetailPatientPageState extends State<DetailPatientPage> {
                         const Padding(padding: EdgeInsets.symmetric(vertical: 3)),
                         textKeyWithValue(context, key: '${'gender'.tr}: ', value: widget.patient.gender == 'male' ? 'man'.tr : 'woman'.tr),
                         const Padding(padding: EdgeInsets.symmetric(vertical: 3)),
-                        textKeyWithValue(context, key: '${'diagnosis'.tr}: ', value: widget.patient.diagnostic == 'Kosong' ? 'empty'.tr : widget.patient.diagnostic),
+                        textKeyWithValue(
+                          context,
+                          key: '${'diagnosis'.tr}: ',
+                          value: widget.patient.diagnostic == 'Kosong' ? 'empty'.tr : widget.patient.diagnostic,
+                        ),
                         const Padding(padding: EdgeInsets.symmetric(vertical: 3)),
                         textKeyWithValue(context, key: '${'examinerName'.tr}: ', value: widget.patient.responsiblePerson),
                         const Padding(padding: EdgeInsets.symmetric(vertical: 3)),
@@ -101,7 +105,7 @@ class _DetailPatientPageState extends State<DetailPatientPage> {
                           context,
                           key: '${'checkUpResult'.tr}: ',
                           maxLines: 3,
-                          value: listScoringResult.isEmpty ? textResult : listScoringResult.map((e) => painName(e['type'])  ).toString(),
+                          value: listScoringResult.isEmpty ? textResult : listScoringResult.map((e) => painName(e['type'])).toString(),
                         ),
                       ],
                     ),
@@ -118,9 +122,8 @@ class _DetailPatientPageState extends State<DetailPatientPage> {
                               middleText: 'dialog.delete'.tr,
                               onSucces: () async {
                                 Get.back();
-                                Utils.paindreShowLoading();
                                 await PatientController().deletePatientAndScores(widget.patient.id);
-                                Get.back();
+                                Get.back(result: widget.patient.id);
                               },
                               onCancel: () async {
                                 Get.back();

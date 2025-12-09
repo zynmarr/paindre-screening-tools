@@ -12,11 +12,12 @@ cDialog(BuildContext context, {String? title, required String middleText, void F
       radius: 10,
       actions: [
         ElevatedButton(
+          style: context.theme.elevatedButtonTheme.style!,
           onPressed: onSucces,
           child: Text('yes'.tr, style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
         ),
         ElevatedButton(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)),
+          style: context.theme.elevatedButtonTheme.style!.copyWith(backgroundColor: WidgetStateProperty.all(Colors.red)),
           onPressed: onCancel,
           child: Text('no'.tr, style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
         ),

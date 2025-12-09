@@ -112,6 +112,12 @@ Map texts = {
     'text.welcomeInLogin': 'Welcome,',
     'text.loginFirst': 'Please login first to continue',
 
+    'text.resetPassword': 'Reset Password',
+    'text.forgotPasswordInstruction': 'Enter your email address below and we\'ll send you a link to reset your password.',
+    'text.forgotPassword': 'Forgot Password?',
+    'text.sendResetLink': 'Send Reset Link',
+    'text.resetPasswordSuccess': 'A password reset link has been sent to your email.',
+
     'text.headline.register.1': 'Don\'t have an account?',
     'text.headline.register.2': 'Please register your account here',
 
@@ -127,11 +133,16 @@ Map texts = {
 
     'text.requiredUpdate': 'Please update to the latest version to use this application...',
     'text.maintenanceMode': 'The system is under maintenance. Please try again later.',
-    // 'text'
   },
   'id': {
     'text.welcomeInLogin': 'Selamat Datang,',
     'text.loginFirst': 'Silakan masuk terlebih dahulu',
+
+    'text.resetPassword': 'Reset Kata Sandi',
+    'text.forgotPasswordInstruction': 'Masukkan alamat email Anda di bawah ini dan kami akan mengirimkan tautan untuk mereset kata sandi Anda.',
+    'text.forgotPassword': 'Lupa Kata Sandi?',
+    'text.sendResetLink': 'Kirim Tautan Reset',
+    'text.resetPasswordSuccess': 'Tautan reset kata sandi telah dikirim ke email Anda.',
 
     'text.headline.register.1': 'Belum Punya Akun?',
     'text.headline.register.2': 'Silahkan daftar akun anda disini',
@@ -247,18 +258,28 @@ Map validations = {
   'en': {
     'validation.required': 'This field is required',
     'validation.invalidEmail': 'Invalid email address',
+    'validation.invalidInput': 'Invalid input',
+    'validation.invalidPhone': 'Invalid phone number',
+    'validation.invalidNumber': 'Invalid number',
+    'validation.detectURL': 'Input cannot be a URL',
+    'validation.invalidURL': 'Invalid URL',
     'validation.name.required': 'Name is required',
     'validation.email.required': 'Email is required',
     'validation.password.required': 'Password is required',
-    'validation.password.minLength': 'Password must be at least 6 characters long',
+    'validation.password.minLength': 'Password must be at least 8 characters long',
   },
   'id': {
     'validation.required': 'Kolom ini harus diisi',
     'validation.invalidEmail': 'Alamat email tidak valid',
+    'validation.invalidInput': 'Input tidak valid',
+    'validation.invalidPhone': 'Nomor telepon tidak valid',
+    'validation.invalidNumber': 'Nomor tidak valid',
+    'validation.detectURL': 'Input tidak boleh berupa URL',
+    'validation.invalidURL': 'URL tidak valid',
     'validation.name.required': 'Nama harus diisi',
     'validation.email.required': 'Email harus diisi',
     'validation.password.required': 'Password harus diisi',
-    'validation.password.minLength': 'Password harus terdiri dari minimal 6 karakter',
+    'validation.password.minLength': 'Password harus terdiri dari minimal 8 karakter',
   },
 };
 
@@ -270,6 +291,7 @@ Map dialogs = {
     'dialog.delete': 'Are you sure you want to delete this data?',
     'dialog.exit': 'Are you sure you want to exit the application?',
     'dialog.exitPage': 'Are you sure you want to exit this page?',
+    'dialog.logout': 'Are you sure you want to logout?',
   },
   'id': {
     'dialog.title': 'Pemberitahuan',
@@ -278,15 +300,15 @@ Map dialogs = {
     'dialog.delete': 'Apakah Anda yakin menghapus data ini?',
     'dialog.exit': 'Apakah Anda yakin ingin keluar dari aplikasi?',
     'dialog.exitPage': 'Apakah Anda yakin ingin keluar dari halaman ini?',
+    'dialog.logout': 'Apakah Anda yakin ingin keluar?',
   },
 };
-
-//map success messages
 Map successMessage = {
   'en': {
     'success.message.login': 'Login successful!',
     'success.message.register': 'Registration successful! Please login to continue.',
     'success.message.save': 'Data saved successfully!',
+    'success.messsage.patient.save': 'Patient data saved successfully!',
     'success.message.logout': 'Logout successful!',
     'success.message.delete': 'Data deleted successfully!',
   },
@@ -294,12 +316,11 @@ Map successMessage = {
     'success.message.login': 'Masuk berhasil!',
     'success.message.register': 'Pendaftaran berhasil! Silakan masuk untuk melanjutkan.',
     'success.message.save': 'Data berhasil disimpan!',
+    'success.messsage.patient.save': 'Data pasien berhasil disimpan!',
     'success.message.logout': 'Keluar berhasil!',
     'success.message.delete': 'Data berhasil dihapus!',
   },
 };
-
-//map error
 Map errorsMessage = {
   'en': {
     'error.message.login': 'Login failed: ',
@@ -375,15 +396,11 @@ Map<String, Map<String, String>> questions = {
 
     'questions.nociceptive.9.title': 'Pain has recently arisen',
     'questions.nociceptive.9.subtitle': 'Has the pain you feel lasted for a short time (less than 3 months)?',
-
-    // Physical examination
     'questions.nociceptive.10.title': 'During movement, the pain felt is clear and anatomically appropriate',
     'questions.nociceptive.10.subtitle': '',
 
     'questions.nociceptive.11.title': 'On palpation, localized pressure pain is felt at the injury site',
     'questions.nociceptive.11.subtitle': '',
-
-    // Neuropathic Pain Questions
     'questions.neuropathic.1.title': 'Pain feels like burning, sharp, electric shock, or stabbing',
     'questions.neuropathic.1.subtitle': 'Do you feel pain like burning, sharp, electric shock, or stabbing sensation?',
 
@@ -409,8 +426,6 @@ Map<String, Map<String, String>> questions = {
 
     'questions.neuropathic.8.title': 'Pain occurs spontaneously and worsens',
     'questions.neuropathic.8.subtitle': 'Does your pain feel worse when you are sad, angry, stressed, or having problems with others?',
-
-    // Physical examination
     'questions.neuropathic.9.title':
         'Pain worsens with movement tests, including active/passive movements, neurodynamic tests with SLR and Plexus Brachialis tests',
     'questions.neuropathic.9.subtitle': '',
@@ -427,8 +442,6 @@ Map<String, Map<String, String>> questions = {
 
     'questions.neuropathic.13.title': 'The presence of hyperalgesia or allodynia',
     'questions.neuropathic.13.subtitle': '',
-
-    // Central Sensitization Pain Questions
     'questions.central.1.title': 'Inconsistency between the pain felt and the activities performed',
     'questions.central.1.subtitle': 'Do you feel pain when performing light movements?',
 
@@ -466,8 +479,6 @@ Map<String, Map<String, String>> questions = {
 
     'questions.central.12.title': 'If pain is stimulated, it takes a long time for the pain to subside',
     'questions.central.12.subtitle': 'Does your pain easily occur and take a long time to go away?',
-
-    // Physical examination
     'questions.central.13.title': 'Movement tests can cause disproportionate pain',
     'questions.central.13.subtitle': '',
 
@@ -513,15 +524,11 @@ Map<String, Map<String, String>> questions = {
 
     'questions.nociceptive.9.title': 'Nyeri timbul baru-baru ini',
     'questions.nociceptive.9.subtitle': 'Apakah nyeri yang Anda rasakan berlangsung belum lama?(kurang dari 3 bulan)',
-
-    // Physical examination
     'questions.nociceptive.10.title': 'Pada pergerakan, nyeri yang dirasakan jelas dan sesuai dengan anatomis',
     'questions.nociceptive.10.subtitle': '',
 
     'questions.nociceptive.11.title': 'Pada palpasi, nyeri tekan dirasakan terlokalisir pada daerah cedera',
     'questions.nociceptive.11.subtitle': '',
-
-    // Neuropathic Pain Questions
     'questions.neuropathic.1.title': 'Nyeri yang dirasakan seperti sensasi terbakar, tajam, tersengat listrik atau tersetrum',
     'questions.neuropathic.1.subtitle': 'Apakah Anda merasakan nyeri seperti sensasi terbakar, tajam, tersengat listrik atau tersetrum?',
 
@@ -550,8 +557,6 @@ Map<String, Map<String, String>> questions = {
     'questions.neuropathic.8.title': 'Nyeri yang dirasakan terjadi secara spontan dan memberat',
     'questions.neuropathic.8.subtitle':
         'Apakah nyeri Anda terasa lebih berat bila Anda sedang sedih, marah, stres, atau sedang bermasalah dengan orang lain?',
-
-    // Physical examination
     'questions.neuropathic.9.title':
         'Nyeri memberat dengan tes pergerakan, diantaranya pergerakan aktif/pasif, Neurodinamik dengan tes SLR dan tes Plexus Brachialis',
     'questions.neuropathic.9.subtitle': '',
@@ -568,8 +573,6 @@ Map<String, Map<String, String>> questions = {
 
     'questions.neuropathic.13.title': 'Ditemukannya hiperalgesia atau alodinia',
     'questions.neuropathic.13.subtitle': '',
-
-    // Central Sensitization Pain Questions
     'questions.central.1.title': 'Ketidaksesuaian antara nyeri yang dirasakan dengan aktivitas yang dilakukan',
     'questions.central.1.subtitle': 'Apakah Anda merasakan nyeri bila melakukan gerakan-gerakan ringan?',
 
@@ -608,8 +611,6 @@ Map<String, Map<String, String>> questions = {
 
     'questions.central.12.title': 'Apabila nyeri terstimulasi, maka dibutuhkan waktu yang lama untuk nyeri tersebut menghilang',
     'questions.central.12.subtitle': 'Apakah nyeri Anda mudah terjadi, dan butuh waktu yang lama sebelum menghilang?',
-
-    // Physical examination
     'questions.central.13.title': 'Uji gerak dapat menyebabkan nyeri yang tidak proporsional',
     'questions.central.13.subtitle': '',
 

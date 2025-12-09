@@ -1,8 +1,7 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:screening_tools_android/app/controllers/authentication/authentication_controller.dart';
-import 'package:screening_tools_android/app/routes/routes.dart';
 import 'package:screening_tools_android/app/utils/utils.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
 
@@ -22,7 +21,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
-  final AuthController _authController = AuthController();
+  // final AuthController _authController = AuthController();
+  final _authController = Get.find<AuthenticationController>();
 
   bool _isObscurePassword = true;
 
@@ -35,6 +35,20 @@ class _RegisterPageState extends State<RegisterPage> {
     _nameFocusNode.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _register() async {
+    if (_formKey.currentState!.validate()) {
+      // Utils.paindreShowLoading(); // Tampilkan loading
+      try {
+        String name = _nameController.text;
+        String email = _emailController.text.trim();
+        String password = _passwordController.text.trim();
+        await _authController.registerWithEmailAndPassword(name: name, email: email, password: password);
+      } catch (error) {
+        Utils.errorToast(message: error.toString());
+      }
+    }
   }
 
   @override
@@ -107,20 +121,12 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         child: Column(
           children: [
-            // Text("Register", style: context.textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold)),
-            // const Padding(padding: EdgeInsets.symmetric(vertical: 8)),
             cTextField(
               label: 'name'.tr,
               controller: _nameController,
               focusNode: _nameFocusNode,
               keyboardType: TextInputType.name,
               hintText: 'hint.name'.tr,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'validation.name.required'.tr;
-                }
-                return null;
-              },
             ),
             const Padding(padding: EdgeInsets.symmetric(vertical: 8)),
             cTextField(
@@ -129,15 +135,6 @@ class _RegisterPageState extends State<RegisterPage> {
               focusNode: _emailFocusNode,
               keyboardType: TextInputType.emailAddress,
               hintText: 'hint.email'.tr,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'validation.email.required'.tr;
-                }
-                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                  return 'validation.invalidEmail'.tr;
-                }
-                return null;
-              },
             ),
             const Padding(padding: EdgeInsets.symmetric(vertical: 8)),
             cPasswordField(
@@ -150,15 +147,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   _isObscurePassword = !_isObscurePassword;
                 });
               },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'validation.password.required'.tr;
-                }
-                if (value.length < 6) {
-                  return 'validation.password.minLength'.tr; // Pastikan password minimal 6 karakter
-                }
-                return null;
-              },
             ),
           ],
         ),
@@ -169,51 +157,46 @@ class _RegisterPageState extends State<RegisterPage> {
   SizedBox _registerButton() {
     return SizedBox(
       width: context.width / 3,
-      child: ElevatedButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            Utils.paindreShowLoading(); // Tampilkan loading
-            try {
-              // Ambil email dan password dari controller
-              String name = _nameController.text;
-              String email = _emailController.text.trim();
-              String password = _passwordController.text.trim();
-
-              // Mendaftar dengan email dan password
-              await _authController.registerWithEmailAndPassword(name: name, email: email, password: password);
-              // Jika pendaftaran berhasil, navigasi ke halaman home atau halaman lain
-              Get.offNamed(Routes.login);
-              Utils.successToast(message: 'success.message.register'.tr);
-            } catch (error) {
-              // Tangani kesalahan pendaftaran
-              Utils.errorToast(message: error.toString());
-            } finally {
-              // Tutup loading di akhir
-              BotToast.closeAllLoading();
-            }
-          }
-        },
-        child: Text('button.register'.tr.toUpperCase(), style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
-      ),
+      child: Obx(() {
+        final bool isLoading = _authController.isLoading.value;
+        return ElevatedButton(
+          onPressed: isLoading ? () {} : _register,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: WidgetStateColor.resolveWith((states) {
+              if (isLoading) return Colors.grey[600]!;
+              return Colors.blue[800]!;
+            }),
+          ),
+          child:
+              isLoading
+                  ? const SpinKitFadingCircle(color: Colors.white, size: 25.0)
+                  : Text(
+                    'button.register'.tr.toUpperCase(),
+                    style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+        );
+      }),
     );
   }
 
   Container _footer() {
     return Container(
       width: context.width,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       color: Colors.white,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('text.haveAccount'.tr, style: context.textTheme.bodyLarge),
-          const SizedBox(width: 4),
           GestureDetector(
             onTap: () {
               Get.back();
             },
-            child: Text('button.login'.tr, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+              child: Text('button.login'.tr, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+            ),
           ),
         ],
       ),

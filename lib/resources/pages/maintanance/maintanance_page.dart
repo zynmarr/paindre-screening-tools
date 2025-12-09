@@ -1,9 +1,8 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:screening_tools_android/app/routes/routes.dart';
-import 'package:screening_tools_android/app/utils/utils.dart';
 
 class MaintanancePage extends StatefulWidget {
   const MaintanancePage({super.key});
@@ -22,17 +21,15 @@ class _MaintanancePageState extends State<MaintanancePage> {
         stream: optionsApp.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            Utils.paindreShowLoading();
-            Utils.errorToast(message: 'error.message.unknown'.tr);
+            return Center(child: Text('error.message.network'.tr));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            Utils.paindreShowLoading();
+            return Center(child: SpinKitFadingCircle(color: Colors.black, size: 30.0));
           }
 
           if (snapshot.hasData) {
             var option = snapshot.data!.docs[0].data() as Map<String, dynamic>;
-            BotToast.closeAllLoading();
 
             if (option['maintanance_mode'] == false) {
               Future.delayed(Duration(seconds: 2)).then((value) => Get.offAllNamed(Routes.home));
@@ -47,7 +44,7 @@ class _MaintanancePageState extends State<MaintanancePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 110, width: 110, child: Image.asset('assets/images/maintanance_icon.png')),
+                SizedBox(height: 110, width: 110, child: Image.asset('assets/images/maintanance_icon.webp')),
                 SizedBox(height: 25),
                 Container(
                   alignment: Alignment.center,
@@ -62,7 +59,6 @@ class _MaintanancePageState extends State<MaintanancePage> {
                   width: context.width / 1.8,
                   child: ElevatedButton(
                     onPressed: () {
-                      BotToast.showLoading();
                       setState(() {});
                     },
                     child: Text(

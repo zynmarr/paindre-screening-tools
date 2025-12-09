@@ -3,10 +3,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:screening_tools_android/app/controllers/patient/patient.dart';
-import 'package:screening_tools_android/app/routes/routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:screening_tools_android/app/utils/utils.dart';
-import 'package:screening_tools_android/resources/pages/patient/detail_patient_page.dart';
 
 part 'cappbar.dart';
 part 'ccard.dart';
@@ -71,7 +69,6 @@ cLoading() {
     height: 80,
     width: 80,
     decoration: BoxDecoration(
-      // color: const Color.fromARGB(211, 255, 255, 255),
       borderRadius: BorderRadius.circular(10),
     ),
     child: Column(
@@ -108,6 +105,25 @@ Widget cTextField({
               if (value == null || value.isEmpty) {
                 return 'validation.required'.tr;
               }
+              if (keyboardType == TextInputType.name && !RegExp(r"^[a-zA-Z\s]+$").hasMatch(value)) {
+                return 'validation.invalidInput'.tr;
+              }
+              if (keyboardType == TextInputType.emailAddress && !GetUtils.isEmail(value)) {
+                return 'validation.invalidEmail'.tr;
+              }
+              if (keyboardType == TextInputType.phone && !GetUtils.isPhoneNumber(value)) {
+                return 'validation.invalidPhone'.tr;
+              }
+              if (keyboardType == TextInputType.number && !GetUtils.isNumericOnly(value)) {
+                return 'validation.invalidNumber'.tr;
+              }
+              if (keyboardType == TextInputType.url && !GetUtils.isURL(value)) {
+                return 'validation.invalidURL'.tr;
+              }
+              if (keyboardType != TextInputType.url && keyboardType != TextInputType.emailAddress && (value.startsWith('http') || value.startsWith('https') || value.contains('.') || GetUtils.isURL(value))) {
+                return 'validation.detectURL'.tr;
+              }
+
               return null;
             },
         decoration: cInputDecoration(hintText: hintText, border: border),
@@ -133,6 +149,7 @@ Widget cPasswordField({
         showCursor: true,
         controller: controller,
         focusNode: focusNode,
+        keyboardType: TextInputType.visiblePassword,
         obscureText: isObsecure,
         style: Get.textTheme.bodyMedium!,
         validator:
@@ -140,6 +157,12 @@ Widget cPasswordField({
             (value) {
               if (value == null || value.isEmpty) {
                 return 'validation.required'.tr;
+              }
+              if (value.length < 8) {
+                return 'validation.password.minLength'.tr;
+              }
+              if (value.startsWith('http') || value.startsWith('https') || GetUtils.isURL(value)) {
+                return 'validation.detectURL'.tr;
               }
               return null;
             },
@@ -155,7 +178,6 @@ Widget cPasswordField({
 class RPSCustomPainter2 extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Layer 1
     Paint paintFill0 =
         Paint()
           ..color = Colors.blue[900]!
@@ -174,8 +196,6 @@ class RPSCustomPainter2 extends CustomPainter {
     path_0.close();
 
     canvas.drawPath(path_0, paintFill0);
-
-    // Layer 1
     Paint paintStroke0 =
         Paint()
           ..color = const Color.fromARGB(255, 33, 150, 243)
@@ -196,7 +216,6 @@ class RPSCustomPainter2 extends CustomPainter {
 class RPSCustomPainter1 extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Layer 1
 
     Paint paintFill0 =
         Paint()

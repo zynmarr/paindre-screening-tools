@@ -6,6 +6,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:screening_tools_android/app/controllers/patient/patient.dart';
 import 'package:screening_tools_android/app/routes/routes.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 class PainResultArguments {
   final Patient patient;
@@ -24,6 +26,26 @@ class PainResultPage extends StatefulWidget {
 class _PainResultPageState extends State<PainResultPage> {
   String textResult = 'text.allResultExamination'.tr;
   String textResult2 = 'text.painResultData'.tr;
+
+  final InAppReview _inAppReview = InAppReview.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _triggerInAppReview(); // Panggil fungsi pemicu review
+  }
+
+  Future<void> _triggerInAppReview() async {
+    final box = GetStorage();
+    int screeningCount = box.read('screening_completed_count') ?? 0;
+    screeningCount++;
+    await box.write('screening_completed_count', screeningCount);
+    if (screeningCount == 3) {
+      if (await _inAppReview.isAvailable()) {
+        _inAppReview.requestReview();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +73,6 @@ class _PainResultPageState extends State<PainResultPage> {
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
 
             child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
                   height: gWidth,
@@ -80,8 +101,6 @@ class _PainResultPageState extends State<PainResultPage> {
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             List<Map<String, dynamic>> item = snapshot.data!.docs.map((p) => p.data()).toList();
-
-                            // debugPrint(item.length.toString());
 
                             if (item.isNotEmpty) {
                               return Column(

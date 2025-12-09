@@ -43,10 +43,6 @@
 -keep class com.google.android.gms.** { *; }
 -keep class com.google.firebase.** { *; }
 
-# Gson
-#-keep class com.paindre_innovation.screening_tools_android.models.** { *; }  # Ganti dengan package model Anda
-#-keepclassmembers class com.paindre_innovation.screening_tools_android.models.** { *; }  # Ganti dengan package model Anda
-
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn com.google.android.play.core.tasks.OnFailureListener

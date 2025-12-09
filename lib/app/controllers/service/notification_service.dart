@@ -1,6 +1,4 @@
-// Firebase Messaging Service
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 @pragma('vm:entry-point')
@@ -23,29 +21,13 @@ class NotificationService {
     await _requestPermission();
     await setupFlutternotification();
     await setupMessageHandlers();
-
-    // final token = await _messaging.getToken();
-    // debugPrint('FCM Token: $token');
   }
 
   Future<void> _requestPermission() async {
-    // Meminta izin untuk notifikasi
     NotificationSettings settings = await _messaging.requestPermission(alert: true, badge: true, provisional: false, sound: true);
-
-    // Memeriksa status izin yang diberikan
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // Izin diberikan, Anda dapat menampilkan notifikasi
-      debugPrint("Izin notifikasi diberikan.");
-      // Tambahkan logika untuk mengatur notifikasi di sini
     } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-      // Izin sementara diberikan, Anda dapat menampilkan notifikasi dengan batasan
-      debugPrint("Izin notifikasi sementara diberikan.");
-      // Tambahkan logika untuk mengatur notifikasi sementara di sini
-    } else {
-      // Izin ditolak
-      debugPrint("Izin notifikasi ditolak.");
-      // Tambahkan logika untuk menangani penolakan izin di sini
-    }
+    } else {}
   }
 
   Future<void> setupFlutternotification() async {
@@ -61,17 +43,18 @@ class NotificationService {
 
       final AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      final DarwinInitializationSettings initializationSettingsIOS =
-          DarwinInitializationSettings(requestAlertPermission: true, requestBadgePermission: true, requestSoundPermission: true);
-
-      final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-
-      await _localNotifications.initialize(
-        initializationSettings,
-        onDidReceiveNotificationResponse: (details) {
-          // debugPrint('Notification received: ${details.toString()}');
-        },
+      final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
       );
+
+      final InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+      );
+
+      await _localNotifications.initialize(initializationSettings, onDidReceiveNotificationResponse: (details) {});
       _flutterLocalInitialized = true;
     }
 
@@ -109,12 +92,7 @@ class NotificationService {
     await _requestPermission();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      // debugPrint('Got a message whilst in the foreground!');
-      // debugPrint('Message data: ${message.data}');
-
-      if (message.notification != null) {
-        // debugPrint('Message also contained a notification: ${message.notification}');
-      }
+      if (message.notification != null) {}
 
       await showNotification(message);
     });
@@ -122,18 +100,11 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen(_handleBackgroundMessage);
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      // debugPrint('Handling a background message: ${initialMessage.messageId}');
       _handleBackgroundMessage(initialMessage);
     }
-
-    // FirebaseMessaging.onBackgroundMessage()
   }
 
   void _handleBackgroundMessage(RemoteMessage message) {
-    if (message.data['type'] == 'chat') {
-      // debugPrint('Key and value background message: ${message.data}');
-      // Handle chat message
-    }
-    // debugPrint('Key and value background message: ${message.data}');
+    if (message.data['type'] == 'chat') {}
   }
 }

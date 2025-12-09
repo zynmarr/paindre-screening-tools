@@ -1,12 +1,12 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.util.Properties
 import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics") // Jika menggunakan Firebase
+    id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
     id("org.jetbrains.kotlin.android")
 }
@@ -19,7 +19,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.paindre_innovation.screening_tools_android"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -33,14 +33,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.paindre_innovation.screening_tools_android"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.5.1"
+        versionCode = 11
+        versionName = "1.5.2"
         manifestPlaceholders["appAuthRedirectScheme"] = "apple-auth-scheme"
     }
 
@@ -75,6 +72,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            configure<CrashlyticsExtension> {
+                nativeSymbolUploadEnabled = false
+            }
             signingConfig = signingConfigs.getByName("release") // Gunakan release keystore
             ndk {
                 abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a")) // Specify the ABIs you want to support
@@ -84,15 +84,11 @@ android {
 }
 
 dependencies {
-    // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
-
-    // Add the dependency for the Performance Monitoring library
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
     implementation("com.google.firebase:firebase-perf")
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
-
-    // Play services dependencies
     implementation("com.google.android.play:asset-delivery-ktx:2.3.0")
     implementation("com.google.android.play:feature-delivery-ktx:2.1.0")
     implementation("com.google.android.play:review-ktx:2.0.2")
@@ -106,3 +102,9 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// tasks.whenTaskAdded {
+//     if (name == "uploadCrashlyticsMappingFileRelease") {
+//         enabled = false
+//     }
+// }

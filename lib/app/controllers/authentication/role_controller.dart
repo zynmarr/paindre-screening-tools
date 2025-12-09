@@ -2,12 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RoleController {
-  // check user firebase auth
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference<Map<String, dynamic>> userCollection = FirebaseFirestore.instance.collection('users');
-
-  //check user and create user collection if not exists
   Future<void> checkUserAndCreate() async {
     final user = _auth.currentUser;
     if (user == null) return;

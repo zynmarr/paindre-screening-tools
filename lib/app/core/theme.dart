@@ -22,31 +22,14 @@ class AppTheme {
     fontFamily: GoogleFonts.openSans().fontFamily,
     appBarTheme: AppBarTheme(backgroundColor: Colors.blue[900]!, iconTheme: const IconThemeData(color: Colors.white)),
     textTheme: TextTheme(
-      // Judul besar (untuk judul halaman atau bagian utama)
       headlineLarge: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: headlineLarge, fontWeight: FontWeight.w600),
-
-      // Judul sedang (untuk subjudul atau bagian penting)
       headlineMedium: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: headlineMedium, fontWeight: FontWeight.w600),
-
-      // Judul kecil (untuk subbagian atau judul kecil)
       headlineSmall: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: headlineSmall, fontWeight: FontWeight.w600),
-
-      // Teks besar (untuk konten utama)
       bodyLarge: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: bodyLarge, fontWeight: FontWeight.normal),
-
-      // Teks sedang (untuk konten biasa)
       bodyMedium: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: bodyMedium, fontWeight: FontWeight.normal),
-
-      // Teks kecil (untuk keterangan atau teks sekunder)
       bodySmall: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: bodySmall, fontWeight: FontWeight.normal),
-
-      // Label besar (untuk tombol atau label penting)
       labelLarge: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: labelLarge, fontWeight: FontWeight.w600),
-
-      // Label sedang (untuk label biasa)
       labelMedium: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: labelMedium, fontWeight: FontWeight.w500),
-
-      // Label kecil (untuk label kecil atau keterangan)
       labelSmall: TextStyle(fontFamily: GoogleFonts.kanit().fontFamily, fontSize: labelSmall, fontWeight: FontWeight.w400),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -76,7 +59,28 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-        backgroundColor: WidgetStatePropertyAll(Colors.blue[800]!),
+        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8, horizontal: 10)),
+        backgroundColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return Colors.grey[900]!; // Warna saat tombol dinonaktifkan
+          }
+          if (states.contains(WidgetState.pressed)) {
+            return Colors.blue[800]!; // Warna saat tombol ditekan
+          }
+          if (states.contains(WidgetState.hovered)) {
+            return Colors.blue[800]!; // Warna saat tombol dihover
+          }
+          if (states.contains(WidgetState.focused)) {
+            return Colors.blue[600]!; // Warna saat tombol difokuskan
+          }
+          if (states.contains(WidgetState.selected)) {
+            return Colors.blue[900]!; // Warna saat tombol dipilih
+          }
+          if (states.contains(WidgetState.error)) {
+            return Colors.red; // Warna saat tombol dalam keadaan error
+          }
+          return Colors.blue[800]!;
+        }),
         textStyle: WidgetStateProperty.all(
           TextStyle(color: Colors.black, fontSize: labelMedium, fontWeight: FontWeight.w600, fontFamily: GoogleFonts.kanit().fontFamily),
         ),

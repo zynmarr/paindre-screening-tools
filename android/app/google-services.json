@@ -47,10 +47,10 @@
               "client_type": 3
             },
             {
-              "client_id": "1009083053499-2vm3aljjhfq5pvac8l1b481jgdota7g6.apps.googleusercontent.com",
+              "client_id": "1009083053499-ipk8fq7e64aaukjtj7vm2jhc6u6denpn.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.paindreinnovation.screeningToolsAndroid",
+                "bundle_id": "com.paindreinnovation.screeningTools",
                 "app_store_id": "6751793557"
               }
             }

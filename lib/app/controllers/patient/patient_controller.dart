@@ -2,150 +2,62 @@ part of 'patient.dart';
 
 class PatientController {
   final CollectionReference _patients = FirebaseFirestore.instance.collection('patients');
-
-  // final CollectionReference scoringResults = FirebaseFirestore.instance.collection('scoring_results');
-
-  CollectionReference get patients => _patients;
-
+  final User? user = FirebaseAuth.instance.currentUser;
+  final CollectionReference<Patient> patients = FirebaseFirestore.instance
+      .collection('patients')
+      .withConverter<Patient>(fromFirestore: (snapshot, _) => Patient.fromMap(snapshot.data()!), toFirestore: (patient, _) => patient.toMap());
   CollectionReference questionnareScore({required String patientID}) {
     return FirebaseFirestore.instance.collection('patients/$patientID/questionnares_score');
   }
 
-  // ScoringResultController scoringResultController = ScoringResultController();
+  final questionController = Get.find<QuestionController>();
+  final isFetching = false.obs;
+  final isLoading = false.obs;
 
-  /// 🟢 CREATE: Menambahkan pasien baru ke Firestore
-  Future<Patient> create(Patient patient) async {
+  Future<void> createPatient(Patient patient) async {
+    final Trace trace = FirebasePerformance.instance.newTrace("create_patient_firestore");
+    await trace.start();
     try {
-      DocumentReference docRef = await _patients.add(patient.toMap());
+      isLoading.value = true;
+      DocumentReference docRef = await patients.add(patient);
       await docRef.update({'id': docRef.id});
-      DocumentSnapshot doc = await docRef.get();
-      return Patient.fromMap(doc.data() as Map<String, dynamic>);
+      patient = patient.copyWith(id: docRef.id);
+      Get.offAllNamed(
+        Routes.question,
+        arguments: QuestionArguments(question: "Nyeri Nosiseptif", patient: patient),
+        predicate: (route) => route.settings.name == Routes.home,
+      );
     } catch (e) {
-      Utils.errorToast(message: e.toString());
-      return Future.error(e.toString());
-    }
-  }
-
-  /// 🔵 READ: Mendapatkan semua pasien dari Firestore
-  Future getAll(String id) async {
-    try {
-      QuerySnapshot snapshot = await _patients.doc(id).collection('questionnares_score').get();
-      debugPrint(snapshot.docs.map((e) => e.data()).toString());
-      // return snapshot.docs.map((doc) => Patient.fromMap(doc.data() as Map<String, dynamic>)).toList();
-    } catch (e) {
-      Utils.errorToast(message: e.toString());
-      return Future.error(e.toString());
-    }
-  }
-
-  /// 🔵 READ: Mendapatkan satu pasien berdasarkan ID
-  Future<Patient?> getById(String id) async {
-    try {
-      DocumentSnapshot doc = await _patients.doc(id).get();
-      if (doc.exists) {
-        return Patient.fromMap(doc.data() as Map<String, dynamic>);
-      }
-      return null;
-    } catch (e) {
-      Utils.errorToast(message: e.toString());
-      return Future.error(e.toString());
-    }
-  }
-
-  /// 🟡 UPDATE: Mengupdate data pasien berdasarkan ID
-  Future<void> update(String id, Map<String, dynamic> data) async {
-    try {
-      await _patients.doc(id).update(data);
-      Utils.successToast(message: "Data pasien berhasil diperbarui");
-    } catch (e) {
-      Utils.errorToast(message: e.toString());
-      return Future.error(e.toString());
-    }
-  }
-
-  // Future<void> updateScoring() async {
-  //   try {
-  //     QuerySnapshot scoringData = await scoringResults.get();
-  //     List<ScoringResult> data = scoringData.docs.map((p) => ScoringResult.fromMap(p.data() as Map<String, dynamic>)).toList();
-  //     // print(data);
-  //     for (ScoringResult item in data) {
-  //       await FirebaseFirestore.instance.collection('patients/${item.idPatient}/questionnares_score').get().then((value) async {
-  //         for (QueryDocumentSnapshot<Map<String, dynamic>> element in value.docs) {
-  //           print(element.id);
-
-  //           await FirebaseFirestore.instance
-  //               .collection('patients/${item.idPatient}/questionnares_score')
-  //               .doc(element.id)
-  //               .update({
-  //                 "type": element.data()["type"],
-  //                 "value": element.data()['value'],
-  //                 "created_at": DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now()).toString()
-  //               });
-  //         }
-  //       });
-
-  //       // Object? dataPatient = newPatient.docs.first.data();
-
-  //       // for (Map<String, dynamic> que in dataPatient) {
-  //       //   que.update('created_at', (value) => 'New', ifAbsent: () => DateTime.now().toString());
-  //       //   print(que);
-  //       // }
-  //       // newPatient.add({
-  //       //   "type": item.type,
-  //       //   "value": item.value,
-  //       // });
-  //     }
-  //     // await _patients.doc(id).delete();
-  //     Utils.successToast(message: "Data pasien berhasil digenerate");
-  //   } catch (e) {
-  //     Utils.errorToast(message: e.toString());
-  //     return Future.error(e.toString());
-  //   }
-  // }
-
-  /// 🔴 DELETE: Menghapus pasien berdasarkan ID
-  Future<void> delete(String id) async {
-    try {
-      await questionnareScore(patientID: id).get();
-      await _patients.doc(id).delete();
-      Utils.successToast(message: "Data pasien berhasil dihapus");
-    } catch (e) {
-      Utils.errorToast(message: e.toString());
-      return Future.error(e.toString());
+      Utils.errorToast(message: "${'error.message.save'.tr}: ${e.toString()}");
+    } finally {
+      isLoading.value = false;
+      trace.stop();
     }
   }
 
   Future<void> deletePatientAndScores(String patientId) async {
-    // Referensi ke koleksi pasien
+    final Trace trace = FirebasePerformance.instance.newTrace("delete_patient_and_scores_firestore");
+    await trace.start();
     DocumentReference patientRef = FirebaseFirestore.instance.collection('patients').doc(patientId);
-
-    // Referensi ke koleksi questionnares_score
     CollectionReference scoresRef = patientRef.collection('questionnares_score');
-
-    // Mulai batch
     WriteBatch batch = FirebaseFirestore.instance.batch();
-
     try {
-      // Ambil semua dokumen dalam koleksi questionnares_score
       QuerySnapshot scoresSnapshot = await scoresRef.get();
-
-      // Tambahkan penghapusan dokumen ke batch
       for (QueryDocumentSnapshot scoreDoc in scoresSnapshot.docs) {
         batch.delete(scoreDoc.reference);
       }
-
-      // Hapus dokumen pasien
       batch.delete(patientRef);
-
-      // Komit batch
       await batch.commit();
-      debugPrint("Patient and related scores deleted successfully");
     } catch (e) {
-      debugPrint("Failed to delete patient and scores: $e");
+      Utils.errorToast(message: e.toString());
+    } finally {
+      trace.stop();
     }
   }
 
   Future createQuestionnareScore({required Patient patient, required ScoringResult data}) async {
+    final Trace trace = FirebasePerformance.instance.newTrace("save_score_to_firestore");
+    await trace.start();
     final CollectionReference document = _patients.doc(patient.id).collection('questionnares_score');
     try {
       DocumentReference docRef = await document.add(data.toMap());
@@ -154,18 +66,45 @@ class PatientController {
     } catch (e) {
       Utils.errorToast(message: e.toString());
       return Future.error(e.toString());
+    } finally {
+      trace.stop();
     }
   }
 
-  Future<void> exportDataToExcel() async {
-    // Ambil data dari Firestore
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('patients').get();
+  Future<String> processAndSaveScore({required String question, required Patient patient, required int sbjScore, required int peScore}) async {
+    String textResult;
+    String dateFormat = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now()).toString();
+    bool isPainDetected = false;
+    String painType = '';
+    String painKey = '';
+    if (question == 'Nyeri Nosiseptif') {
+      painKey = 'pain.nociceptive'.tr;
+      if (sbjScore >= 5 && peScore >= 1) isPainDetected = true;
+    } else if (question == 'Nyeri Neuropatik') {
+      painKey = 'pain.neuropathic'.tr;
+      if (sbjScore >= 5 && peScore >= 3) isPainDetected = true;
+    } else if (question == 'Nyeri Sensitisasi Sentral') {
+      painKey = 'pain.centralSensitization'.tr;
+      if (sbjScore >= 8 && peScore >= 4) isPainDetected = true;
+    }
+    if (isPainDetected) {
+      painType = question;
+      ScoringResult data = ScoringResult(type: painType, value: (sbjScore + peScore).toString(), createdAt: dateFormat);
+      await createQuestionnareScore(patient: patient, data: data);
+      textResult = 'text.resultIs'.tr + painKey;
+    } else {
+      textResult = 'text.resultIsNot'.tr + painKey;
+    }
+    if (painKey.isEmpty) {
+      textResult = 'text.painResultData'.tr;
+    }
+    return textResult;
+  }
 
-    // Buat workbook baru
+  Future<void> exportDataToExcel() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('patients').get();
     var excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
-
-    // Tambahkan header
     sheet.appendRow([
       TextCellValue('Name'),
       TextCellValue('Age'),
@@ -174,14 +113,10 @@ class PatientController {
       TextCellValue("Responsible Person"),
       TextCellValue('Created At'),
       TextCellValue('Data Questionnares score'),
-    ]); // Ganti dengan nama field Anda
-
-    // Tambahkan data ke sheet
+    ]);
     for (var patientDoc in snapshot.docs) {
       QuerySnapshot scoresSnapshot = await patientDoc.reference.collection('questionnares_score').get();
-
       Map<String, dynamic> doc = patientDoc.data() as Map<String, dynamic>;
-
       sheet.appendRow([
         TextCellValue(doc['name'] ?? ''),
         TextCellValue(doc['age'] ?? ''),
@@ -191,54 +126,13 @@ class PatientController {
         TextCellValue(doc['created_at'] ?? ''),
         TextCellValue(scoresSnapshot.docs.map((e) => e.data() as Map<String, dynamic>).toList().toString()),
       ]);
-
-      // if (scoresSnapshot.docs.isEmpty) {
-      //   sheet.appendRow([
-      //     TextCellValue(doc['name'] ?? ''),
-      //     TextCellValue(doc['age'] ?? ''),
-      //     TextCellValue(doc['phone'] ?? ''),
-      //     TextCellValue(doc['gender'] ?? ''),
-      //     TextCellValue(doc['responsible_person'] ?? ''),
-      //     TextCellValue(doc['created_at'] ?? ''),
-      //     TextCellValue('Data Kosong'),
-      //   ]);
-      // } else {
-      //   // Jika ada score, tambahkan data pasien dengan score yang ada
-      //   for (var scoreDoc in scoresSnapshot.docs) {
-      //     sheet.appendRow([
-      //       TextCellValue(doc['name'] ?? ''),
-      //       TextCellValue(doc['age'] ?? ''),
-      //       TextCellValue(doc['phone'] ?? ''),
-      //       TextCellValue(doc['gender'] ?? ''),
-      //       TextCellValue(doc['responsible_person'] ?? ''),
-      //       TextCellValue(doc['created_at'] ?? ''),
-      //       TextCellValue(scoreDoc.data().toString()),
-      //     ]);
-      //   }
-      // }
-
-      // print(doc['name']);
-      // sheet.appendRow([
-      //   TextCellValue(doc['name'] ?? ''),
-      //   TextCellValue(doc['age'] ?? ''),
-      //   TextCellValue(doc['phone'] ?? ''),
-      //   TextCellValue(doc['gender'] ?? ''),
-      //   TextCellValue(doc['responsible_person'] ?? ''),
-      //   TextCellValue(doc['created_at'] ?? ''),
-      // ]); // Ganti dengan field yang sesuai
     }
-
-    // Simpan file Excel
     var status = await Permission.storage.status;
     if (!status.isGranted) {
       await Permission.storage.request();
     }
-    String customPath = '/storage/emulated/0/Download/Backup Database Paindre Screening Tools.xlsx'; // Ganti dengan jalur kustom Anda
-
-    // final directory = await getApplicationDocumentsDirectory();
+    String customPath = '/storage/emulated/0/Download/Backup Database Paindre Screening Tools.xlsx';
     final file = File(customPath);
     await file.writeAsBytes(excel.encode()!);
-
-    debugPrint("Data exported to Excel successfully at ${file.path}");
   }
 }

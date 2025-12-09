@@ -15,7 +15,6 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // Menggunakan addPostFrameCallback untuk memastikan eksekusi setelah build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 3), checkUser);
     });
@@ -35,6 +34,7 @@ class _SplashPageState extends State<SplashPage> {
     double gWidth = context.width / 1.8;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SizedBox(
         height: context.height,
         width: context.width,
@@ -64,7 +64,7 @@ class _SplashPageState extends State<SplashPage> {
                         height: gWidth,
                         width: gWidth,
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-                        child: Image.asset('assets/images/screening-logo-transparan.png'),
+                        child: Image.asset('assets/images/screening-logo-transparan.webp'),
                       ),
                       const SizedBox(height: 15),
                       Container(

@@ -1,5 +1,5 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:screening_tools_android/app/controllers/authentication/authentication_controller.dart';
@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final FocusNode emailFocus = FocusNode();
   final FocusNode passwordFocus = FocusNode();
-  final AuthController _authController = AuthController();
+  final AuthenticationController _authController = AuthenticationController();
 
   bool obSecure = true;
 
@@ -31,6 +31,35 @@ class _LoginPageState extends State<LoginPage> {
     emailFocus.dispose();
     passwordFocus.dispose();
     super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (formKey.currentState!.validate()) {
+      try {
+        String email = emailController.text.trim();
+        String password = passwordController.text.trim();
+
+        await _authController.loginWithEmailAndPassword(email: email, password: password);
+      } catch (error) {
+        Utils.errorToast(message: "${'error.message.login'.tr}${error.toString()}");
+      }
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    try {
+      await _authController.loginWithGoogle();
+    } catch (e) {
+      Utils.errorToast(message: "${'error.message.loginWithGoogle'.tr}${e.toString()}");
+    }
+  }
+
+  Future<void> _loginWithApple() async {
+    try {
+      await _authController.loginWithApple();
+    } catch (e) {
+      Utils.errorToast(message: e.toString());
+    }
   }
 
   @override
@@ -106,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
     return Form(
       key: formKey,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -114,23 +143,12 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: Column(
           children: [
-            // Text("Login", style: context.textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold)),
-            // const SizedBox(height: 8),
             cTextField(
               label: 'email'.tr,
               controller: emailController,
               focusNode: emailFocus,
               keyboardType: TextInputType.emailAddress,
               hintText: 'hint.email'.tr,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'validation.email.required'.tr; // Pastikan email tidak kosong
-                }
-                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                  return 'validation.invalidEmail'.tr; // Validasi format email
-                }
-                return null;
-              },
             ),
             const SizedBox(height: 8),
             cPasswordField(
@@ -150,6 +168,20 @@ class _LoginPageState extends State<LoginPage> {
                 return null;
               },
             ),
+            const SizedBox(height: 8),
+            // Text('text.forgotPassword'.tr, style: context.textTheme.bodyMedium!.copyWith(color: Colors.blue[800], fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () => Get.toNamed(Routes.forgotPassword),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+                    child: Text('text.forgotPassword'.tr, style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.blue[800])),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -159,88 +191,90 @@ class _LoginPageState extends State<LoginPage> {
   SizedBox _buildLoginButton(BuildContext context) {
     return SizedBox(
       width: context.width / 2,
-      child: ElevatedButton(
-        onPressed: () async {
-          if (formKey.currentState!.validate()) {
-            Utils.paindreShowLoading();
-            try {
-              String email = emailController.text.trim();
-              String password = passwordController.text.trim();
-
-              await _authController.loginWithEmailAndPassword(email: email, password: password);
-              Get.offNamed(Routes.home);
-              Utils.successToast(message: 'success.message.login'.tr);
-            } catch (error) {
-              Utils.errorToast(message: "${'error.message.login'.tr}${error.toString()}");
-            } finally {
-              BotToast.closeAllLoading();
-            }
-          }
-        },
-        child: Text('button.login'.tr.toUpperCase(), style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
-      ),
+      child: Obx(() {
+        bool isLoading = _authController.isLoading.value;
+        return ElevatedButton(
+          onPressed: isLoading ? () {} : _login,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: WidgetStateColor.resolveWith((states) {
+              if (isLoading) return Colors.grey[600]!;
+              return Colors.blue[800]!;
+            }),
+          ),
+          child:
+              isLoading
+                  ? const SpinKitFadingCircle(color: Colors.white, size: 25.0)
+                  : Text(
+                    'button.login'.tr.toUpperCase(),
+                    style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+        );
+      }),
     );
   }
 
   SizedBox _buildGoogleLoginButton() {
     return SizedBox(
       width: context.width / 2,
-      child: ElevatedButton.icon(
-        onPressed: () async {
-          Utils.paindreShowLoading();
-          try {
-            await _authController.loginWithGoogle();
-            Get.offNamed(Routes.home);
-            Utils.successToast(message: 'success.message.login'.tr);
-          } catch (e) {
-            Utils.errorToast(message: "${'error.message.loginWithGoogle'.tr}${e.toString()}");
-          } finally {
-            BotToast.closeAllLoading();
-          }
-        },
-        icon: Icon(MdiIcons.google, color: Colors.white),
-        label: Text('text.loginWithGoogle'.tr, style: TextStyle(color: Colors.white)),
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-      ),
+      child: Obx(() {
+        bool isLoading = _authController.isLoading.value;
+        return ElevatedButton.icon(
+          onPressed: isLoading ? () {} : _loginWithGoogle,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: WidgetStateColor.resolveWith((states) {
+              if (isLoading) return Colors.grey[600]!;
+              return Colors.red;
+            }),
+          ),
+          icon: isLoading ? SizedBox() : Icon(MdiIcons.google, color: Colors.white),
+          label:
+              isLoading
+                  ? const SpinKitFadingCircle(color: Colors.white, size: 25.0)
+                  : Text('Login With Google', style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+        );
+      }),
     );
   }
 
   SizedBox _buildAppleLoginButton() {
     return SizedBox(
       width: context.width / 2,
-      child: ElevatedButton.icon(
-        onPressed: () async {
-          Utils.paindreShowLoading();
-          try {
-            await _authController.loginWithApple();
-            Get.offNamed(Routes.home);
-            Utils.successToast(message: 'success.message.login'.tr);
-          } catch (e) {
-            Utils.errorToast(message: "${'error.message.loginWithGoogle'.tr}${e.toString()}");
-          } finally {
-            BotToast.closeAllLoading();
-          }
-        },
-        icon: Icon(MdiIcons.apple, color: Colors.white),
-        label: Text('Login With Apple', style: TextStyle(color: Colors.white)),
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-      ),
+      child: Obx(() {
+        bool isLoading = _authController.isLoading.value;
+        return ElevatedButton.icon(
+          onPressed: isLoading ? () {} : _loginWithApple,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: WidgetStateColor.resolveWith((states) {
+              if (isLoading) return Colors.grey[600]!;
+              return Colors.black;
+            }),
+          ),
+          icon: isLoading ? SizedBox() : Icon(MdiIcons.apple, color: Colors.white),
+          label:
+              isLoading
+                  ? const SpinKitFadingCircle(color: Colors.white, size: 25.0)
+                  : Text('Login With Apple', style: context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white)),
+        );
+      }),
     );
   }
 
   Container _buildFooter() {
     return Container(
       width: context.width,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       color: Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('text.dontHaveAccount'.tr, style: context.textTheme.bodyLarge),
-          const SizedBox(width: 4),
+          // const SizedBox(width: 4),
           GestureDetector(
             onTap: () => Get.toNamed(Routes.register),
-            child: Text('button.register'.tr, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+              child: Text('button.register'.tr, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+            ),
           ),
         ],
       ),

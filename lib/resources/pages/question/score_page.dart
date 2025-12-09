@@ -1,8 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:screening_tools_android/app/controllers/patient/patient.dart';
-import 'package:screening_tools_android/app/controllers/scoring_result/scoring_result.dart';
 import 'package:screening_tools_android/app/routes/routes.dart';
 import 'package:screening_tools_android/resources/components/components.dart';
 import 'package:screening_tools_android/resources/pages/question/pain_result_page.dart';
@@ -29,50 +28,23 @@ class ScorePage extends StatefulWidget {
 }
 
 class _ScorePageState extends State<ScorePage> {
-  String textResult = '';
-
-  String dateFormat = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now()).toString();
-
-  genereteResult() async {
-    if (widget.question == 'Nyeri Nosiseptif') {
-      if (widget.sbjScore >= 5 && widget.peScore >= 1) {
-        ScoringResult data = ScoringResult(type: widget.question, value: (widget.sbjScore + widget.peScore).toString(), createdAt: dateFormat);
-        // textResult = 'Hasil pemeriksaan adalah ${widget.question}';
-        textResult = 'text.resultIs'.tr + 'pain.nociceptive'.tr;
-
-        await PatientController().createQuestionnareScore(patient: widget.patient, data: data);
-      } else {
-        textResult = 'text.resultIsNot'.tr + 'pain.nociceptive'.tr;
-      }
-    } else if (widget.question == 'Nyeri Neuropatik') {
-      if (widget.sbjScore >= 5 && widget.peScore >= 3) {
-        ScoringResult data = ScoringResult(type: widget.question, value: (widget.sbjScore + widget.peScore).toString(), createdAt: dateFormat);
-        textResult = 'text.resultIs'.tr + 'pain.neuropathic'.tr;
-        await PatientController().createQuestionnareScore(patient: widget.patient, data: data);
-      } else {
-        textResult = 'text.resultIsNot'.tr + 'pain.neuropathic'.tr;
-      }
-    } else if (widget.question == 'Nyeri Sensitisasi Sentral') {
-      if (widget.sbjScore >= 8 && widget.peScore >= 4) {
-        ScoringResult data = ScoringResult(type: widget.question, value: (widget.sbjScore + widget.peScore).toString(), createdAt: dateFormat);
-        textResult = 'text.resultIs'.tr + 'pain.centralSensitization'.tr;
-        await PatientController().createQuestionnareScore(patient: widget.patient, data: data);
-      } else {
-        textResult = 'text.resultIsNot'.tr + 'pain.centralSensitization'.tr;
-      }
-    } else {
-      textResult = 'text.painResultData'.tr; // Default text for no specific pain found
-    }
-  }
+  late Future<String> _resultFuture;
+  final PatientController _patientController = PatientController();
 
   @override
   void initState() {
     super.initState();
-    genereteResult();
+    _resultFuture = _patientController.processAndSaveScore(
+      question: widget.question,
+      patient: widget.patient,
+      sbjScore: widget.sbjScore,
+      peScore: widget.peScore,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    double gWidth = context.width / 2.2;
     return Scaffold(
       appBar: cAppBar(title: 'checkUpResult'.tr, centerTitle: true),
       body: Stack(
@@ -92,8 +64,20 @@ class _ScorePageState extends State<ScorePage> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: gWidth,
+                  width: gWidth,
+                  child: CachedNetworkImage(
+                    imageUrl:
+                        'https://lh3.googleusercontent.com/pw/AP1GczO9egAuF1P-qsdsxxQ4CTCETHxXNEB3HDLRRZwuZm1gD5na9vERZtAsNDOWxVW4eVwo8-7nlCOUG6y5Bhk0JEVKcfkY8YL07ZlG9XRPhwX5BwhaDU1iEHLxfCPpOjlyRiO0va3YOw7Dh-oyNjqDvVg=w500-h500-s-no-gm',
+                    filterQuality: FilterQuality.high,
+                    fadeOutDuration: Duration(milliseconds: 500),
+                    fadeInDuration: Duration(milliseconds: 300),
+                  ),
+                ),
+                const SizedBox(height: 25),
                 Container(
                   width: context.width,
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -102,19 +86,34 @@ class _ScorePageState extends State<ScorePage> {
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [BoxShadow(offset: Offset(1, 2), color: Colors.black45, blurRadius: 4)],
                   ),
-                  child: Column(
-                    children: [
-                      Text(textResult, textAlign: TextAlign.center, style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 10),
-                      CircleAvatar(
-                        backgroundColor: Colors.blue,
-                        radius: 26,
-                        child: Text(
-                          (widget.sbjScore + widget.peScore).toString(),
-                          style: context.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ],
+                  child: FutureBuilder<String>(
+                    future: _resultFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Terjadi kesalahan saat memproses skor.', textAlign: TextAlign.center);
+                      }
+                      return Column(
+                        children: [
+                          Text(
+                            snapshot.data ?? 'Tidak ada hasil.',
+                            textAlign: TextAlign.center,
+                            style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          CircleAvatar(
+                            backgroundColor: Colors.blue,
+                            radius: 26,
+                            child: Text(
+                              (widget.sbjScore + widget.peScore).toString(),
+                              style: context.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 20),

@@ -1,8 +1,7 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:screening_tools_android/app/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RequestUpdatePage extends StatefulWidget {
@@ -22,18 +21,12 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
         stream: optionsApp.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            Utils.paindreShowLoading();
-            Utils.errorToast(message: 'error.message.unknown'.tr);
+            return Center(child: Text('error.message.network'.tr));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            Utils.paindreShowLoading();
+            return Center(child: SpinKitFadingCircle(color: Colors.black, size: 30.0));
           }
-
-          if (snapshot.hasData) {
-            BotToast.closeAllLoading();
-          }
-
           return Container(
             height: context.height,
             width: context.width,
@@ -42,7 +35,7 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 110, width: 110, child: Image.asset('assets/images/maintanance_icon.png')),
+                SizedBox(height: 110, width: 110, child: Image.asset('assets/images/maintanance_icon.webp')),
                 SizedBox(height: 25),
                 Container(
                   alignment: Alignment.center,
@@ -57,7 +50,9 @@ class _RequestUpdatePageState extends State<RequestUpdatePage> {
                   width: context.width / 1.8,
                   child: ElevatedButton(
                     onPressed: () async {
-                      Uri url = Uri.parse('https://play.google.com/store/apps/details?id=com.paindre_innovation.screening_tools_android'); // Ganti dengan URL aplikasi Anda
+                      Uri url = Uri.parse(
+                        'https://play.google.com/store/apps/details?id=com.paindre_innovation.screening_tools_android',
+                      ); // Ganti dengan URL aplikasi Anda
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url);
                       } else {
